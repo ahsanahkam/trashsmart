@@ -1,0 +1,50 @@
+# Temporary files
+*.tmp
+*.temp
+*.log
+*.bak
+*~
+
+# IDE and editor files
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# PHP specific
+*.cache
+composer.phar
+vendor/
+
+# Database files (don't commit actual database files)
+*.sql
+*.db
+*.sqlite
+
+# Environment files
+.env
+.env.local
+.env.production
+
+# Test files
+test_*.php
+*_test.php
+debug_*.php
+
+# Documentation temp files
+*.md~
+*_SUMMARY.md
+*_CLEANUP.md
+
+# Backup files
+backup/
+*.backup

@@ -1,0 +1,692 @@
+/* ========================================
+   TrashSmart - Custom Styles
+   ======================================== */
+
+/* Custom Color Palette */
+:root {
+    --color-green-50: #f0fdf4;
+    --color-green-100: #dcfce7;
+    --color-green-200: #bbf7d0;
+    --color-green-300: #86efac;
+    --color-green-400: #4ade80;
+    --color-green-500: #22c55e;
+    --color-green-600: #16a34a;
+    --color-green-700: #15803d;
+    --color-green-800: #166534;
+    --color-green-900: #14532d;
+    
+    --color-brown-50: #fdf8f6;
+    --color-brown-100: #f2e8e5;
+    --color-brown-200: #eaddd7;
+    --color-brown-300: #e0cec7;
+    --color-brown-400: #d2bab0;
+    --color-brown-500: #bfa094;
+    --color-brown-600: #a18072;
+    --color-brown-700: #977669;
+    --color-brown-800: #846358;
+    --color-brown-900: #43302b;
+}
+
+/* ========================================
+   Base Styles
+   ======================================== */
+
+/* Font Family */
+.font-poppins {
+    font-family: 'Poppins', sans-serif;
+}
+
+/* Custom Colors */
+.bg-brown-50 { background-color: var(--color-brown-50); }
+.bg-brown-100 { background-color: var(--color-brown-100); }
+.bg-brown-200 { background-color: var(--color-brown-200); }
+.bg-brown-300 { background-color: var(--color-brown-300); }
+.bg-brown-400 { background-color: var(--color-brown-400); }
+.bg-brown-500 { background-color: var(--color-brown-500); }
+.bg-brown-600 { background-color: var(--color-brown-600); }
+.bg-brown-700 { background-color: var(--color-brown-700); }
+.bg-brown-800 { background-color: var(--color-brown-800); }
+.bg-brown-900 { background-color: var(--color-brown-900); }
+
+.text-brown-50 { color: var(--color-brown-50); }
+.text-brown-100 { color: var(--color-brown-100); }
+.text-brown-200 { color: var(--color-brown-200); }
+.text-brown-300 { color: var(--color-brown-300); }
+.text-brown-400 { color: var(--color-brown-400); }
+.text-brown-500 { color: var(--color-brown-500); }
+.text-brown-600 { color: var(--color-brown-600); }
+.text-brown-700 { color: var(--color-brown-700); }
+.text-brown-800 { color: var(--color-brown-800); }
+.text-brown-900 { color: var(--color-brown-900); }
+
+.border-brown-50 { border-color: var(--color-brown-50); }
+.border-brown-100 { border-color: var(--color-brown-100); }
+.border-brown-200 { border-color: var(--color-brown-200); }
+.border-brown-300 { border-color: var(--color-brown-300); }
+.border-brown-400 { border-color: var(--color-brown-400); }
+.border-brown-500 { border-color: var(--color-brown-500); }
+.border-brown-600 { border-color: var(--color-brown-600); }
+.border-brown-700 { border-color: var(--color-brown-700); }
+.border-brown-800 { border-color: var(--color-brown-800); }
+.border-brown-900 { border-color: var(--color-brown-900); }
+
+.hover\:bg-brown-50:hover { background-color: var(--color-brown-50); }
+.hover\:bg-brown-100:hover { background-color: var(--color-brown-100); }
+.hover\:bg-brown-200:hover { background-color: var(--color-brown-200); }
+.hover\:bg-brown-300:hover { background-color: var(--color-brown-300); }
+.hover\:bg-brown-400:hover { background-color: var(--color-brown-400); }
+.hover\:bg-brown-500:hover { background-color: var(--color-brown-500); }
+.hover\:bg-brown-600:hover { background-color: var(--color-brown-600); }
+.hover\:bg-brown-700:hover { background-color: var(--color-brown-700); }
+.hover\:bg-brown-800:hover { background-color: var(--color-brown-800); }
+.hover\:bg-brown-900:hover { background-color: var(--color-brown-900); }
+
+.hover\:text-brown-50:hover { color: var(--color-brown-50); }
+.hover\:text-brown-100:hover { color: var(--color-brown-100); }
+.hover\:text-brown-200:hover { color: var(--color-brown-200); }
+.hover\:text-brown-300:hover { color: var(--color-brown-300); }
+.hover\:text-brown-400:hover { color: var(--color-brown-400); }
+.hover\:text-brown-500:hover { color: var(--color-brown-500); }
+.hover\:text-brown-600:hover { color: var(--color-brown-600); }
+.hover\:text-brown-700:hover { color: var(--color-brown-700); }
+.hover\:text-brown-800:hover { color: var(--color-brown-800); }
+.hover\:text-brown-900:hover { color: var(--color-brown-900); }
+
+/* ========================================
+   Component Styles
+   ======================================== */
+
+/* Navigation Links */
+.nav-link {
+    position: relative;
+    font-weight: 500;
+    transition: all 0.3s ease;
+}
+
+.nav-link::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 0;
+    height: 2px;
+    background-color: #16a34a;
+    transition: all 0.3s ease;
+}
+
+.nav-link:hover::after {
+    width: 100%;
+}
+
+/* Button Styles */
+.btn-primary {
+    background-color: #16a34a;
+    color: white;
+    padding: 0.75rem 1.5rem;
+    border-radius: 0.5rem;
+    font-weight: 500;
+    transition: all 0.3s ease;
+    transform: scale(1);
+}
+
+.btn-primary:hover {
+    background-color: #15803d;
+    transform: scale(1.05);
+}
+
+.btn-secondary {
+    background-color: var(--color-brown-600);
+    color: white;
+    padding: 0.75rem 1.5rem;
+    border-radius: 0.5rem;
+    font-weight: 500;
+    transition: all 0.3s ease;
+    transform: scale(1);
+}
+
+.btn-secondary:hover {
+    background-color: var(--color-brown-700);
+    transform: scale(1.05);
+}
+
+.btn-outline {
+    border: 2px solid #16a34a;
+    color: #16a34a;
+    padding: 0.75rem 1.5rem;
+    border-radius: 0.5rem;
+    font-weight: 500;
+    transition: all 0.3s ease;
+}
+
+.btn-outline:hover {
+    background-color: #16a34a;
+    color: white;
+}
+
+/* Card Styles */
+.card {
+    background-color: white;
+    border-radius: 0.75rem;
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+    transition: all 0.3s ease;
+    transform: translateY(0);
+}
+
+.card:hover {
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+    transform: translateY(-8px);
+}
+
+.card-hover {
+    transition: all 0.3s ease;
+}
+
+.card-hover:hover {
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+    transform: scale(1.05);
+}
+
+/* Form Styles */
+.form-input {
+    width: 100%;
+    padding: 0.75rem 1rem;
+    border: 1px solid #d1d5db;
+    border-radius: 0.5rem;
+    transition: all 0.3s ease;
+}
+
+.form-input:focus {
+    outline: none;
+    box-shadow: 0 0 0 2px #22c55e;
+    border-color: transparent;
+}
+
+.form-label {
+    display: block;
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: #374151;
+    margin-bottom: 0.5rem;
+}
+
+/* Modal Styles */
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.5);
+    z-index: 50;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 1rem;
+}
+
+.modal-content {
+    background-color: white;
+    border-radius: 1rem;
+    padding: 2rem;
+    max-width: 28rem;
+    width: 100%;
+    max-height: 90vh;
+    overflow-y: auto;
+}
+
+/* Section Styles */
+.section-padding {
+    padding-top: 4rem;
+    padding-bottom: 4rem;
+}
+
+.section-title {
+    font-size: 1.875rem;
+    font-weight: 700;
+    color: #1f2937;
+    margin-bottom: 1rem;
+}
+
+.section-subtitle {
+    font-size: 1.25rem;
+    color: #6b7280;
+    max-width: 42rem;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+/* ========================================
+   Animation Classes
+   ======================================== */
+
+/* Fade In Animation */
+.fade-in {
+    animation: fadeIn 0.6s ease-in-out;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Slide In Animation */
+.slide-in-left {
+    animation: slideInLeft 0.6s ease-out;
+}
+
+@keyframes slideInLeft {
+    from {
+        opacity: 0;
+        transform: translateX(-50px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+.slide-in-right {
+    animation: slideInRight 0.6s ease-out;
+}
+
+@keyframes slideInRight {
+    from {
+        opacity: 0;
+        transform: translateX(50px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+/* Bounce Animation */
+.bounce-in {
+    animation: bounceIn 0.8s ease-out;
+}
+
+@keyframes bounceIn {
+    0% {
+        opacity: 0;
+        transform: scale(0.3);
+    }
+    50% {
+        opacity: 1;
+        transform: scale(1.05);
+    }
+    70% {
+        transform: scale(0.9);
+    }
+    100% {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+/* Pulse Animation */
+.pulse-green {
+    animation: pulseGreen 2s infinite;
+}
+
+@keyframes pulseGreen {
+    0%, 100% {
+        box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.7);
+    }
+    50% {
+        box-shadow: 0 0 0 10px rgba(34, 197, 94, 0);
+    }
+}
+
+/* ========================================
+   Responsive Design
+   ======================================== */
+
+/* Mobile First Approach */
+@media (max-width: 640px) {
+    .container {
+        padding-left: 1rem;
+        padding-right: 1rem;
+    }
+    
+    .section-padding {
+        padding-top: 3rem;
+        padding-bottom: 3rem;
+    }
+    
+    .section-title {
+        font-size: 1.5rem;
+    }
+    
+    .section-subtitle {
+        font-size: 1.125rem;
+    }
+}
+
+/* Tablet Styles */
+@media (min-width: 641px) and (max-width: 1024px) {
+    .container {
+        padding-left: 1.5rem;
+        padding-right: 1.5rem;
+    }
+}
+
+/* Desktop Styles */
+@media (min-width: 1025px) {
+    .container {
+        padding-left: 2rem;
+        padding-right: 2rem;
+    }
+}
+
+/* ========================================
+   Custom Scrollbar
+   ======================================== */
+
+/* Webkit browsers (Chrome, Safari, Edge) */
+::-webkit-scrollbar {
+    width: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb {
+    background: #c1c1c1;
+    border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: #a8a8a8;
+}
+
+/* Firefox */
+* {
+    scrollbar-width: thin;
+    scrollbar-color: #c1c1c1 #f1f1f1;
+}
+
+/* ========================================
+   Focus Styles for Accessibility
+   ======================================== */
+
+/* Focus styles for interactive elements */
+button:focus,
+input:focus,
+textarea:focus,
+select:focus,
+a:focus {
+    outline: none;
+    box-shadow: 0 0 0 2px #22c55e, 0 0 0 4px white;
+}
+
+/* Skip to content link for accessibility */
+.skip-link {
+    position: absolute;
+    top: 1rem;
+    left: 1rem;
+    background-color: #16a34a;
+    color: white;
+    padding: 0.5rem 1rem;
+    border-radius: 0.5rem;
+    transform: translateY(-100%);
+    transition: transform 0.3s ease;
+    z-index: 50;
+}
+
+.skip-link:focus {
+    transform: translateY(0);
+}
+
+/* ========================================
+   Loading States
+   ======================================== */
+
+.loading {
+    opacity: 0.5;
+    pointer-events: none;
+}
+
+.loading-spinner {
+    display: inline-block;
+    width: 1rem;
+    height: 1rem;
+    border: 2px solid #d1d5db;
+    border-top: 2px solid #16a34a;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+/* ========================================
+   Success/Error States
+   ======================================== */
+
+.success-message {
+    background-color: #dcfce7;
+    border: 1px solid #4ade80;
+    color: #166534;
+    padding: 0.75rem 1rem;
+    border-radius: 0.5rem;
+    margin-bottom: 1rem;
+}
+
+.error-message {
+    background-color: #fee2e2;
+    border: 1px solid #f87171;
+    color: #991b1b;
+    padding: 0.75rem 1rem;
+    border-radius: 0.5rem;
+    margin-bottom: 1rem;
+}
+
+.warning-message {
+    background-color: #fef3c7;
+    border: 1px solid #fbbf24;
+    color: #92400e;
+    padding: 0.75rem 1rem;
+    border-radius: 0.5rem;
+    margin-bottom: 1rem;
+}
+
+/* ========================================
+   Utility Classes
+   ======================================== */
+
+.text-shadow {
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.text-shadow-lg {
+    text-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+}
+
+.backdrop-blur {
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+}
+
+.glass-effect {
+    background-color: rgba(255, 255, 255, 0.2);
+    backdrop-filter: blur(8px);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+/* ========================================
+   Custom Gradients
+   ======================================== */
+
+.gradient-green {
+    background: linear-gradient(135deg, #16a34a 0%, #22c55e 100%);
+}
+
+.gradient-brown {
+    background: linear-gradient(135deg, #a18072 0%, #bfa094 100%);
+}
+
+.gradient-hero {
+    background: linear-gradient(135deg, #f0fdf4 0%, #fdf8f6 100%);
+}
+
+/* ========================================
+   Hover Effects
+   ======================================== */
+
+.hover-lift {
+    transition: all 0.3s ease;
+    transform: translateY(0);
+}
+
+.hover-lift:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+}
+
+.hover-glow {
+    transition: all 0.3s ease;
+}
+
+.hover-glow:hover {
+    box-shadow: 0 10px 15px -3px rgba(34, 197, 94, 0.25);
+}
+
+.hover-scale {
+    transition: all 0.3s ease;
+    transform: scale(1);
+}
+
+.hover-scale:hover {
+    transform: scale(1.05);
+}
+
+/* ========================================
+   Custom Spacing
+   ======================================== */
+
+.space-section {
+    padding-top: 5rem;
+    padding-bottom: 5rem;
+}
+
+.space-section-sm {
+    padding-top: 3rem;
+    padding-bottom: 3rem;
+}
+
+.space-section-lg {
+    padding-top: 8rem;
+    padding-bottom: 8rem;
+}
+
+/* ========================================
+   Image Styles
+   ======================================== */
+
+.img-cover {
+    object-fit: cover;
+    width: 100%;
+    height: 100%;
+}
+
+.img-contain {
+    object-fit: contain;
+    width: 100%;
+    height: 100%;
+}
+
+.img-rounded {
+    border-radius: 1rem;
+}
+
+.img-shadow {
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+}
+
+/* ========================================
+   Typography Enhancements
+   ======================================== */
+
+.text-gradient {
+    background: linear-gradient(135deg, #16a34a 0%, #22c55e 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.text-gradient-brown {
+    background: linear-gradient(135deg, #a18072 0%, #bfa094 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+/* ========================================
+   Custom Border Radius
+   ======================================== */
+
+.rounded-custom {
+    border-radius: 20px;
+}
+
+.rounded-custom-lg {
+    border-radius: 30px;
+}
+
+/* ========================================
+   Custom Shadows
+   ======================================== */
+
+.shadow-custom {
+    box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+}
+
+.shadow-custom-lg {
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+}
+
+.shadow-green {
+    box-shadow: 0 10px 25px -5px rgba(34, 197, 94, 0.3);
+}
+
+/* ========================================
+   Print Styles
+   ======================================== */
+
+@media print {
+    /* Hide non-essential elements when printing */
+    header,
+    footer,
+    .modal-overlay,
+    .btn-primary,
+    .btn-secondary {
+        display: none !important;
+    }
+    
+    /* Ensure text is readable */
+    body {
+        color: black;
+        background-color: white;
+    }
+    
+    /* Remove shadows and backgrounds */
+    .card,
+    .modal-content {
+        box-shadow: none;
+        background-color: white;
+    }
+}
+
+/* ========================================
+   End of Custom Styles
+   ======================================== */
