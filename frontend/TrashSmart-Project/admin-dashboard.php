@@ -115,7 +115,7 @@ if (isset($_POST['action']) && $_POST['action'] === 'delete_request') {
 // Get filter parameters
 $status_filter = isset($_GET['status']) ? $_GET['status'] : '';
 $district_filter = isset($_GET['district']) ? $_GET['district'] : '';
-$pending_limit = isset($_GET['show_all_pending']) ? 1000 : 10; // Show 10 by default, 1000 when "View More" is clicked
+$pending_limit = isset($_GET['show_all_pending']) ? 100 : 10; // Show 10 by default, 1000 when "View More" is clicked
 
 // Get all requests with user information
 $conn = getDatabaseConnection();
