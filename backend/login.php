@@ -27,12 +27,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             // Find user by email
             $user = $db->fetch("SELECT * FROM users WHERE email = ? AND status = 'active'", [$email]);
             
-            if ($user && $password === $user['password']) {
+            if ($user && password_verify($password, $user['password'])) {
                 // Login successful
                 $_SESSION['user_id'] = $user['user_id'];
                 $_SESSION['user_email'] = $user['email'];
                 $_SESSION['user_type'] = $user['user_type'];
-                $_SESSION['user_name'] = $user['user_name'];
+                // Prefer explicit first/last name; fall back to user_name if present
+                $fullName = trim((($user['first_name'] ?? '') . ' ' . ($user['last_name'] ?? '')));
+                $_SESSION['user_name'] = $fullName !== '' ? $fullName : ($user['user_name'] ?? '');
                 $_SESSION['status'] = $user['status'] ?? 'active';
                 
                 // Update last login

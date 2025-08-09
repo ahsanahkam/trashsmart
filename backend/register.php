@@ -52,6 +52,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $error = 'Please enter a valid email address.';
         } elseif (strlen($password) < 6) {
             $error = 'Password must be at least 6 characters long.';
+        } elseif (!preg_match('/[a-zA-Z]/', $password)) {
+            $error = 'Password must contain at least one letter.';
+        } elseif (!preg_match('/\d/', $password)) {
+            $error = 'Password must contain at least one number.';
         } else {
             // Validate phone number
             $cleanPhone = preg_replace('/[^0-9+]/', '', $phone);
@@ -64,44 +68,76 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     // If no errors, process registration
     if (!$error) {
         try {
-            // Connect to database
-            $db = new Database();
+            // CRITICAL: Hash password FIRST before any database operations
+            $hashedPassword = password_hash($password, PASSWORD_DEFAULT);
+            
+            // Verify the hash was created correctly
+            if (!$hashedPassword || strlen($hashedPassword) < 60) {
+                throw new Exception('Password hashing failed');
+            }
+            
+            // Connect to database using direct mysqli for reliability
+            $conn = new mysqli('localhost', 'root', '', 'trashsmart');
+            if ($conn->connect_error) {
+                throw new Exception('Database connection failed: ' . $conn->connect_error);
+            }
             
             // Check if email already exists
-            $existingUser = $db->fetch("SELECT user_id FROM users WHERE email = ?", [$email]);
-            if ($existingUser) {
+            $checkStmt = $conn->prepare("SELECT user_id FROM users WHERE email = ?");
+            $checkStmt->bind_param("s", $email);
+            $checkStmt->execute();
+            $result = $checkStmt->get_result();
+            
+            if ($result->num_rows > 0) {
                 $error = 'This email is already registered. Please use a different email or login.';
+                $checkStmt->close();
+                $conn->close();
             } else {
-                // Insert new user with plain text password
-                $db->query(
+                $checkStmt->close();
+                
+                // Insert new user with HASHED password
+                $insertStmt = $conn->prepare(
                     "INSERT INTO users (first_name, last_name, email, password, phone, date_of_birth, 
                      district, nearest_town, address, user_type, status, created_at) 
-                     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, 'citizen', 'active', NOW())",
-                    [
-                        $firstName,
-                        $lastName,
-                        $email,
-                        $password,
-                        $cleanPhone,
-                        $dateOfBirth,
-                        $district,
-                        $nearestTown,
-                        $address
-                    ]
+                     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, 'citizen', 'active', NOW())"
                 );
                 
-                $userId = $db->lastInsertId();
+                if (!$insertStmt) {
+                    throw new Exception('Failed to prepare insert statement: ' . $conn->error);
+                }
                 
-                // Auto-login after successful registration
-                $_SESSION['user_id'] = $userId;
-                $_SESSION['user_email'] = $email;
-                $_SESSION['user_type'] = 'citizen';
-                $_SESSION['user_name'] = $firstName . ' ' . $lastName;
-                $_SESSION['status'] = 'active';
+                $insertStmt->bind_param(
+                    "sssssssss",
+                    $firstName,
+                    $lastName,
+                    $email,
+                    $hashedPassword,  // THIS IS THE HASHED PASSWORD
+                    $cleanPhone,
+                    $dateOfBirth,
+                    $district,
+                    $nearestTown,
+                    $address
+                );
                 
-                // Redirect to citizen profile
-                header('Location: ../frontend/TrashSmart-Project/citizen-profile.php');
-                exit;
+                if ($insertStmt->execute()) {
+                    $userId = $conn->insert_id;
+
+                    // Auto-login after successful registration
+                    $_SESSION['user_id'] = $userId;
+                    $_SESSION['user_email'] = $email;
+                    $_SESSION['user_type'] = 'citizen';
+                    $_SESSION['user_name'] = $firstName . ' ' . $lastName;
+                    $_SESSION['status'] = 'active';
+                    
+                    $insertStmt->close();
+                    $conn->close();
+                    
+                    // Redirect to citizen profile
+                    header('Location: ../frontend/TrashSmart-Project/citizen-profile.php');
+                    exit;
+                } else {
+                    throw new Exception('Failed to insert user: ' . $insertStmt->error);
+                }
             }
         } catch (Exception $e) {
             error_log("Registration error: " . $e->getMessage());
@@ -122,6 +158,46 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
         body { font-family: 'Poppins', sans-serif; }
+        
+        /* Password strength indicator styles */
+        .password-requirement {
+            padding: 2px 0;
+            transition: color 0.3s ease;
+        }
+        
+        .requirement-met {
+            color: #10b981 !important;
+        }
+        
+        .requirement-unmet {
+            color: #ef4444 !important;
+        }
+        
+        /* Input field focus states */
+        input:focus {
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.1);
+        }
+        
+        .input-valid {
+            border-color: #10b981 !important;
+            background-color: #f0fdf4;
+        }
+        
+        .input-invalid {
+            border-color: #ef4444 !important;
+            background-color: #fef2f2;
+        }
+        
+        /* Feedback animations */
+        .feedback-enter {
+            animation: fadeIn 0.3s ease-in;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-5px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
     </style>
 </head>
 <body class="bg-gradient-to-br from-green-50 to-brown-50 min-h-screen py-8 px-4">
@@ -172,9 +248,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             <!-- Password Fields -->
             <div>
                 <label for="password" class="block text-sm font-medium text-gray-700 mb-1">Password</label>
-                <input type="password" id="password" name="password" required 
+          <input type="password" id="password" name="password" required minlength="6"
+              pattern="^(?=.*[a-zA-Z])(?=.*[0-9]).*$"
+              title="Password must be at least 6 characters long and contain both letters and numbers" autocomplete="new-password"
                        class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all">
-                <p class="text-xs text-gray-500 mt-1">Minimum 6 characters</p>
+                <p class="text-xs text-gray-500 mt-1">Minimum 6 characters with letters and numbers</p>
+                <div id="password-feedback" class="mt-1 text-xs hidden"></div>
             </div>
             
             <div>
@@ -241,6 +320,120 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             </a>
         </div>
     </div>
+
+    <script>
+        // Enhanced client-side password validation with real-time feedback
+        document.addEventListener('DOMContentLoaded', function() {
+            const passwordField = document.getElementById('password');
+            const confirmPasswordField = document.getElementById('confirmPassword');
+            const passwordFeedback = document.getElementById('password-feedback');
+            
+            function validatePassword() {
+                const password = passwordField.value;
+                const confirmPassword = confirmPasswordField.value;
+                
+                // Password strength validation (updated requirements)
+                const hasLetters = /[a-zA-Z]/.test(password);
+                const hasNumbers = /\d/.test(password);
+                const hasMinLength = password.length >= 6;
+                
+                // Clear existing feedback
+                passwordFeedback.innerHTML = '';
+                passwordFeedback.className = 'mt-1 text-xs';
+                
+                if (password.length > 0) {
+                    let feedbackMessages = [];
+                    let isValid = true;
+                    
+                    // Check minimum length
+                    if (!hasMinLength) {
+                        feedbackMessages.push('❌ At least 6 characters');
+                        isValid = false;
+                    } else {
+                        feedbackMessages.push('✅ Length requirement met');
+                    }
+                    
+                    // Check for letters
+                    if (!hasLetters) {
+                        feedbackMessages.push('❌ Must contain letters (a-z, A-Z)');
+                        isValid = false;
+                    } else {
+                        feedbackMessages.push('✅ Contains letters');
+                    }
+                    
+                    // Check for numbers
+                    if (!hasNumbers) {
+                        feedbackMessages.push('❌ Must contain numbers (0-9)');
+                        isValid = false;
+                    } else {
+                        feedbackMessages.push('✅ Contains numbers');
+                    }
+                    
+                    // Display feedback
+                    passwordFeedback.innerHTML = feedbackMessages.join('<br>');
+                    passwordFeedback.classList.remove('hidden');
+                    
+                    if (isValid) {
+                        passwordFeedback.className += ' text-green-600';
+                        passwordField.style.borderColor = '#10b981';
+                    } else {
+                        passwordFeedback.className += ' text-red-600';
+                        passwordField.style.borderColor = '#ef4444';
+                    }
+                } else {
+                    passwordFeedback.classList.add('hidden');
+                    passwordField.style.borderColor = '#d1d5db';
+                }
+                
+                // Confirm password validation
+                const confirmFeedback = confirmPasswordField.parentNode.querySelector('.confirm-feedback');
+                if (confirmFeedback) {
+                    confirmFeedback.remove();
+                }
+                
+                if (confirmPassword.length > 0) {
+                    const confirmDiv = document.createElement('div');
+                    confirmDiv.className = 'confirm-feedback mt-1 text-xs';
+                    
+                    if (password === confirmPassword) {
+                        confirmDiv.innerHTML = '✅ Passwords match';
+                        confirmDiv.className += ' text-green-600';
+                        confirmPasswordField.style.borderColor = '#10b981';
+                    } else {
+                        confirmDiv.innerHTML = '❌ Passwords do not match';
+                        confirmDiv.className += ' text-red-600';
+                        confirmPasswordField.style.borderColor = '#ef4444';
+                    }
+                    
+                    confirmPasswordField.parentNode.appendChild(confirmDiv);
+                } else {
+                    confirmPasswordField.style.borderColor = '#d1d5db';
+                }
+            }
+            
+            // Add event listeners for real-time validation
+            passwordField.addEventListener('input', validatePassword);
+            passwordField.addEventListener('focus', validatePassword);
+            confirmPasswordField.addEventListener('input', validatePassword);
+            confirmPasswordField.addEventListener('focus', validatePassword);
+            
+            // Show password requirements on focus
+            passwordField.addEventListener('focus', function() {
+                if (passwordField.value.length === 0) {
+                    passwordFeedback.innerHTML = 'Password Requirements:<br>• Minimum 6 characters<br>• At least one letter (a-z, A-Z)<br>• At least one number (0-9)';
+                    passwordFeedback.className = 'mt-1 text-xs text-blue-600';
+                    passwordFeedback.classList.remove('hidden');
+                }
+            });
+            
+            // Hide empty feedback on blur if password is empty
+            passwordField.addEventListener('blur', function() {
+                if (passwordField.value.length === 0) {
+                    passwordFeedback.classList.add('hidden');
+                }
+            });
+        });
+    </script>
 
 </body>
 </html>

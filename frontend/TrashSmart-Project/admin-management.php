@@ -30,21 +30,34 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
     
     if ($_POST['action'] === 'update_status' && isset($_POST['user_id']) && isset($_POST['status'])) {
         $user_id = intval($_POST['user_id']);
-        $new_status = $_POST['status'];
-        
-        // Validate status
-        if (in_array($new_status, ['active', 'inactive', 'suspended'])) {
+        $action_value = $_POST['status'];
+
+        if ($action_value === 'active' || $action_value === 'suspended') {
+            // Update status only for citizens
             $stmt = $conn->prepare("UPDATE users SET status = ?, updated_at = NOW() WHERE user_id = ? AND user_type = 'citizen'");
-            $stmt->bind_param("si", $new_status, $user_id);
-            
+            $stmt->bind_param("si", $action_value, $user_id);
             if ($stmt->execute()) {
                 $success_message = "User status updated successfully!";
             } else {
                 $error_message = "Failed to update user status.";
             }
             $stmt->close();
+        } elseif ($action_value === 'make_admin') {
+            // Promote citizen to admin
+            $stmt = $conn->prepare("UPDATE users SET user_type = 'admin', updated_at = NOW() WHERE user_id = ? AND user_type = 'citizen'");
+            $stmt->bind_param("i", $user_id);
+            if ($stmt->execute()) {
+                if ($stmt->affected_rows > 0) {
+                    $success_message = "User promoted to admin successfully!";
+                } else {
+                    $error_message = "No changes made. User might already be an admin.";
+                }
+            } else {
+                $error_message = "Failed to promote user to admin.";
+            }
+            $stmt->close();
         } else {
-            $error_message = "Invalid status value.";
+            $error_message = "Invalid action selected.";
         }
     }
     
@@ -429,16 +442,16 @@ $adminName = $_SESSION['user_name'] ?? 'Admin';
                                         <!-- Actions -->
                                         <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
                                             <div class="flex space-x-2">
-                                                <!-- Status Update Dropdown -->
+                                                <!-- Status/Role Action Dropdown -->
                                                 <form method="POST" class="inline-block">
                                                     <input type="hidden" name="action" value="update_status">
                                                     <input type="hidden" name="user_id" value="<?php echo $citizen['user_id']; ?>">
-                                                    <select name="status" onchange="this.form.submit()" 
+                                                    <select name="status" onchange="this.form.submit()"
                                                             class="text-xs px-2 py-1 border border-gray-300 rounded">
-                                                        <option value="">Change Status</option>
+                                                        <option value="">Choose Action</option>
                                                         <option value="active" <?php echo $citizen['status'] === 'active' ? 'disabled' : ''; ?>>Active</option>
-                                                        <option value="inactive" <?php echo $citizen['status'] === 'inactive' ? 'disabled' : ''; ?>>Inactive</option>
-                                                        <option value="suspended" <?php echo $citizen['status'] === 'suspended' ? 'disabled' : ''; ?>>Suspended</option>
+                                                        <option value="suspended" <?php echo $citizen['status'] === 'suspended' ? 'disabled' : ''; ?>>Suspend</option>
+                                                        <option value="make_admin">Make Admin</option>
                                                     </select>
                                                 </form>
                                                 

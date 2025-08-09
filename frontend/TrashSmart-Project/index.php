@@ -86,21 +86,39 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
     } else {
         $conn = getDatabaseConnection();
         
-        $stmt = $conn->prepare("SELECT user_id, user_name, email, password, user_type FROM users WHERE email = ?");
+    $stmt = $conn->prepare("SELECT user_id, first_name, last_name, email, password, user_type FROM users WHERE email = ?");
         $stmt->bind_param("s", $email);
         $stmt->execute();
         $result = $stmt->get_result();
         
         if ($result->num_rows === 1) {
             $user = $result->fetch_assoc();
-            
-            if ($password === $user['password']) {
+
+            $storedHashOrPlain = $user['password'];
+            $isValid = false;
+
+            // Preferred: verify against a hash
+            if (!empty($storedHashOrPlain) && password_verify($password, $storedHashOrPlain)) {
+                $isValid = true;
+            } elseif ($storedHashOrPlain === $password) {
+                // Legacy plaintext password: migrate to hash on successful login
+                $newHash = password_hash($password, PASSWORD_DEFAULT);
+                if ($newHash) {
+                    $update = $conn->prepare("UPDATE users SET password = ? WHERE user_id = ?");
+                    $update->bind_param("si", $newHash, $user['user_id']);
+                    $update->execute();
+                    $update->close();
+                }
+                $isValid = true;
+            }
+
+            if ($isValid) {
                 // Login successful
                 $_SESSION['user_id'] = $user['user_id'];
-                $_SESSION['user_name'] = $user['user_name'];
+                $_SESSION['user_name'] = trim(($user['first_name'] ?? '') . ' ' . ($user['last_name'] ?? ''));
                 $_SESSION['user_email'] = $user['email'];
                 $_SESSION['user_type'] = $user['user_type'];
-                
+
                 // Redirect based on user type
                 if ($user['user_type'] === 'admin') {
                     header('Location: admin-dashboard.php');
@@ -142,6 +160,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
         $register_error = "Passwords do not match.";
     } elseif (strlen($password) < 6) {
         $register_error = "Password must be at least 6 characters long.";
+    } elseif (!preg_match('/[a-zA-Z]/', $password)) {
+        $register_error = "Password must contain at least one letter.";
+    } elseif (!preg_match('/\\d/', $password)) {
+        $register_error = "Password must contain at least one number.";
     } elseif (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
         $register_error = "Please enter a valid email address.";
     } else {
@@ -156,12 +178,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
         if ($result->num_rows > 0) {
             $register_error = "An account with this email already exists.";
         } else {
-            // Store password as plain text (no hashing)
-            $fullName = $firstName . ' ' . $lastName;
+            // Secure: hash password before storing
+            $hashedPassword = password_hash($password, PASSWORD_DEFAULT);
             $userType = 'citizen';
-            
-            $stmt = $conn->prepare("INSERT INTO users (user_name, email, password, user_type, date_of_birth, district, address, nearest_town, phone) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)");
-            $stmt->bind_param("sssssssss", $fullName, $email, $password, $userType, $dateOfBirth, $district, $address, $nearestTown, $phone);
+
+            // Normalize phone (digits and + only)
+            $cleanPhone = preg_replace('/[^0-9+]/', '', $phone);
+
+            // Align with backend schema: store first_name and last_name; set status and created_at
+            $stmt = $conn->prepare("INSERT INTO users (first_name, last_name, email, password, phone, date_of_birth, district, nearest_town, address, user_type, status, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, 'citizen', 'active', NOW())");
+            $stmt->bind_param("sssssssss", $firstName, $lastName, $email, $hashedPassword, $cleanPhone, $dateOfBirth, $district, $nearestTown, $address);
             
             if ($stmt->execute()) {
                 $register_success = "Registration successful! You can now login.";
@@ -169,7 +195,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
                 // Auto-login the user
                 $userId = $conn->insert_id;
                 $_SESSION['user_id'] = $userId;
-                $_SESSION['user_name'] = $fullName;
+                $_SESSION['user_name'] = trim($firstName . ' ' . $lastName);
                 $_SESSION['user_email'] = $email;
                 $_SESSION['user_type'] = $userType;
                 
@@ -803,13 +829,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
                     
                     <div>
                         <label for="citizenPassword" class="block text-sm font-medium text-gray-700 mb-1">Password</label>
-                        <input type="password" id="citizenPassword" name="password" required 
+               <input type="password" id="citizenPassword" name="password" required minlength="6"
+                   pattern="^(?=.*[a-zA-Z])(?=.*[0-9]).*$"
+                               title="Password must be at least 6 characters long and contain both letters and numbers"
                                class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all">
                     </div>
                     
                     <div>
                         <label for="citizenConfirmPassword" class="block text-sm font-medium text-gray-700 mb-1">Confirm Password</label>
-                        <input type="password" id="citizenConfirmPassword" name="confirmPassword" required 
+                        <input type="password" id="citizenConfirmPassword" name="confirmPassword" required minlength="6"
                                class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all">
                     </div>
                     
