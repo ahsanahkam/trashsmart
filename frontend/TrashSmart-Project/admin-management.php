@@ -188,7 +188,7 @@ $adminName = $_SESSION['user_name'] ?? 'Admin';
     <!-- Font Awesome for icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
-<body class="font-poppins bg-gray-50">
+<body class="font-poppins bg-gray-50 text-base md:text-lg">
     
     <!-- Header Section -->
     <header class="fixed top-0 left-0 right-0 bg-white shadow-md z-50">
@@ -255,8 +255,8 @@ $adminName = $_SESSION['user_name'] ?? 'Admin';
             <div class="bg-white rounded-2xl shadow-md p-6 mb-8">
                 <div class="flex items-center justify-between">
                     <div>
-                        <h1 class="text-4xl font-bold text-gray-800 mb-2">Citizen Management</h1>
-                        <p class="text-lg text-gray-600">Manage registered citizens and their account information</p>
+                        <h1 class="text-3xl md:text-4xl font-extrabold text-gray-800 mb-4">Citizen Management</h1>
+                        <p class="text-lg text-gray-700 mb-2">Manage registered citizens and their account information</p>
                     </div>
                     <div class="hidden md:block">
                         <i class="fas fa-users text-6xl text-green-600"></i>
@@ -265,32 +265,32 @@ $adminName = $_SESSION['user_name'] ?? 'Admin';
             </div>
 
             <!-- Statistics Cards -->
-            <div class="grid md:grid-cols-4 gap-6 mb-8">
-                <div class="bg-white rounded-xl shadow-md p-6 text-center">
-                    <i class="fas fa-users text-3xl text-blue-600 mb-3"></i>
-                    <h3 class="text-xl font-semibold text-gray-800">Total Citizens</h3>
-                    <p class="text-3xl font-bold text-blue-600"><?php echo $stats['total_citizens']; ?></p>
+            <div class="grid md:grid-cols-4 gap-8 mb-12">
+                <div class="bg-white rounded-xl shadow-md p-8 text-center">
+                    <i class="fas fa-users text-4xl text-blue-600 mb-4"></i>
+                    <h3 class="text-2xl font-bold text-gray-800 mb-2">Total Citizens</h3>
+                    <p class="text-4xl font-extrabold text-blue-600"><?php echo $stats['total_citizens']; ?></p>
                 </div>
-                <div class="bg-white rounded-xl shadow-md p-6 text-center">
-                    <i class="fas fa-user-check text-3xl text-green-600 mb-3"></i>
-                    <h3 class="text-xl font-semibold text-gray-800">Active</h3>
-                    <p class="text-3xl font-bold text-green-600"><?php echo $stats['active_citizens']; ?></p>
+                <div class="bg-white rounded-xl shadow-md p-8 text-center">
+                    <i class="fas fa-user-check text-4xl text-green-600 mb-4"></i>
+                    <h3 class="text-2xl font-bold text-gray-800 mb-2">Active</h3>
+                    <p class="text-4xl font-extrabold text-green-600"><?php echo $stats['active_citizens']; ?></p>
                 </div>
-                <div class="bg-white rounded-xl shadow-md p-6 text-center">
-                    <i class="fas fa-user-times text-3xl text-gray-600 mb-3"></i>
-                    <h3 class="text-xl font-semibold text-gray-800">Inactive</h3>
-                    <p class="text-3xl font-bold text-gray-600"><?php echo $stats['inactive_citizens']; ?></p>
+                <div class="bg-white rounded-xl shadow-md p-8 text-center">
+                    <i class="fas fa-user-times text-4xl text-gray-600 mb-4"></i>
+                    <h3 class="text-2xl font-bold text-gray-800 mb-2">Inactive</h3>
+                    <p class="text-4xl font-extrabold text-gray-600"><?php echo $stats['inactive_citizens']; ?></p>
                 </div>
-                <div class="bg-white rounded-xl shadow-md p-6 text-center">
-                    <i class="fas fa-user-slash text-3xl text-red-600 mb-3"></i>
-                    <h3 class="text-xl font-semibold text-gray-800">Suspended</h3>
-                    <p class="text-3xl font-bold text-red-600"><?php echo $stats['suspended_citizens']; ?></p>
+                <div class="bg-white rounded-xl shadow-md p-8 text-center">
+                    <i class="fas fa-user-slash text-4xl text-red-600 mb-4"></i>
+                    <h3 class="text-2xl font-bold text-gray-800 mb-2">Suspended</h3>
+                    <p class="text-4xl font-extrabold text-red-600"><?php echo $stats['suspended_citizens']; ?></p>
                 </div>
             </div>
 
             <!-- Search and Filter Section -->
             <div class="bg-white rounded-xl shadow-md p-6 mb-8">
-                <h3 class="text-xl font-semibold text-gray-800 mb-4">
+                <h3 class="text-2xl font-semibold text-gray-800 mb-4">
                     <i class="fas fa-search text-green-600 mr-2"></i>Search & Filter
                 </h3>
                 
@@ -345,9 +345,9 @@ $adminName = $_SESSION['user_name'] ?? 'Admin';
             <!-- Citizens Table -->
             <div class="bg-white rounded-xl shadow-md overflow-hidden">
                 <div class="p-6 border-b border-gray-200">
-                    <h3 class="text-xl font-semibold text-gray-800">
+                    <h3 class="text-2xl font-semibold text-gray-800">
                         <i class="fas fa-table text-green-600 mr-2"></i>Registered Citizens
-                        <span class="text-base text-gray-500 ml-2">(<?php echo count($citizens); ?> records)</span>
+                        <span class="text-lg text-gray-500 ml-2">(<?php echo count($citizens); ?> records)</span>
                     </h3>
                 </div>
                 
@@ -362,13 +362,13 @@ $adminName = $_SESSION['user_name'] ?? 'Admin';
                         <table class="min-w-full divide-y divide-gray-200">
                             <thead class="bg-gray-50">
                                 <tr>
-                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">User</th>
-                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Contact</th>
-                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Location</th>
-                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Requests</th>
-                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
-                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Joined</th>
-                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                                    <th class="px-6 py-3 text-left text-sm font-semibold text-gray-600 uppercase tracking-wider">User</th>
+                                    <th class="px-6 py-3 text-left text-sm font-semibold text-gray-600 uppercase tracking-wider">Contact</th>
+                                    <th class="px-6 py-3 text-left text-sm font-semibold text-gray-600 uppercase tracking-wider">Location</th>
+                                    <th class="px-6 py-3 text-left text-sm font-semibold text-gray-600 uppercase tracking-wider">Requests</th>
+                                    <th class="px-6 py-3 text-left text-sm font-semibold text-gray-600 uppercase tracking-wider">Status</th>
+                                    <th class="px-6 py-3 text-left text-sm font-semibold text-gray-600 uppercase tracking-wider">Joined</th>
+                                    <th class="px-6 py-3 text-left text-sm font-semibold text-gray-600 uppercase tracking-wider">Actions</th>
                                 </tr>
                             </thead>
                             <tbody class="bg-white divide-y divide-gray-200">
