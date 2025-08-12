@@ -217,22 +217,21 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
     $name = trim($_POST['name']);
     $email = trim($_POST['email']);
     $message = trim($_POST['message']);
-    
     if (!empty($name) && !empty($email) && !empty($message)) {
         $conn = getDatabaseConnection();
-        
         $stmt = $conn->prepare("INSERT INTO contact_messages (name, email, message, created_at) VALUES (?, ?, ?, NOW())");
         $stmt->bind_param("sss", $name, $email, $message);
-        
         if ($stmt->execute()) {
-            $contact_success = "Thank you for your message! We'll get back to you soon.";
+            $_SESSION['contact_success'] = "Thank you for your message! We'll get back to you soon.";
         } else {
-            $contact_error = "Failed to send message. Please try again.";
+            $_SESSION['contact_error'] = "Failed to send message. Please try again.";
         }
-        
         $stmt->close();
         $conn->close();
     }
+    // Redirect to clear POST and show message only once
+    header('Location: ' . $_SERVER['REQUEST_URI']);
+    exit;
 }
 ?>
 <!DOCTYPE html>
@@ -325,17 +324,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
     </header>
 
     <!-- Hero Section -->
-    <section id="home" class="pt-20 pb-12 bg-gradient-to-br from-green-50 to-green-100">
+    <section id="home" class="pt-12 pb-16 bg-gradient-to-br from-green-50 to-brown-50">
         <div class="container mx-auto px-4 py-12">
-            <div class="grid lg:grid-cols-2 gap-12 items-center">
-                <div class="text-center lg:text-left">
-                    <h1 class="text-4xl lg:text-5xl font-bold text-gray-800 mb-6 leading-tight">
-                        Smart <span class="text-green-600">Waste Management</span> for a Cleaner Tomorrow
-                    </h1>
+            <div class="flex flex-col lg:flex-row gap-12 items-center bg-white rounded-2xl shadow-lg p-6 h-[40rem] w-full mx-auto">
+                <div class="flex-1 px-8 lg:px-32 text-left">
+                    <h1 class="text-5xl font-extrabold text-black mb-4">Join TrashSmart</h1>
+                    <h2 class="text-3xl font-semibold text-green-700 mb-6">Keep Your Environment Clean!</h2>
                     <p class="text-xl text-gray-600 mb-8 leading-relaxed">
-                        Join thousands of citizens in making waste collection efficient, sustainable, and hassle-free. Request pickups, track collections, and contribute to a greener environment.
+                        Smart waste management for a sustainable future.
+                        Connect with local waste collection services &
+                        Learn proper recycling techniques.
+                        Join our community and make a difference today.
                     </p>
-                    <div class="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start">
+                    <div class="flex flex-col sm:flex-row gap-4 justify-start">
                         <?php if (!isset($_SESSION['user_id'])): ?>
                         <button id="heroLoginBtn" class="bg-green-600 text-white px-8 py-3 rounded-lg hover:bg-green-700 transition-all transform hover:scale-105">
                             Get Started
@@ -344,51 +345,51 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
                             Sign Up Now
                         </button>
                         <?php else: ?>
-                        <a href="<?php echo $_SESSION['user_type'] === 'admin' ? 'admin-dashboard.php' : 'citizen-profile.php'; ?>" class="bg-green-600 text-white px-8 py-3 rounded-lg hover:bg-green-700 transition-all transform hover:scale-105 inline-block text-center">
+                        <a href="<?php echo $_SESSION['user_type'] === 'admin' ? 'admin-dashboard.php' : 'citizen-profile.php'; ?>" class="bg-green-600 text-white px-8 py-3 rounded-lg hover:bg-green-700 transition-all transform hover:scale-105 inline-block text-left">
                             Go to Dashboard
                         </a>
                         <?php endif; ?>
                     </div>
                 </div>
-                <div class="text-center">
-                    <div class="relative">
-                        <?php if (!empty($company_settings['hero_image']) && file_exists($company_settings['hero_image'])): ?>
-                            <img src="<?php echo htmlspecialchars($company_settings['hero_image']) . '?v=' . time(); ?>" alt="<?php echo htmlspecialchars($company_settings['company_name']); ?> Hero Image" class="rounded-2xl shadow-2xl w-full max-w-lg mx-auto">
+                <div class="flex-1 relative w-full h-[28rem] lg:h-[34rem]">
+                    <?php if (!empty($company_settings['hero_image']) && file_exists($company_settings['hero_image'])): ?>
+                        <img src="<?php echo htmlspecialchars($company_settings['hero_image']) . '?v=' . time(); ?>" alt="<?php echo htmlspecialchars($company_settings['company_name']); ?> Hero Image" class="shadow-2xl w-full h-full object-cover">
+                    <?php else: ?>
+                        <!-- Fallback to existing image -->
+                        <?php if (file_exists('images/about-waste-management (2).jpg')): ?>
+                            <img src="images/about-waste-management (2).jpg" alt="<?php echo htmlspecialchars($company_settings['company_name']); ?> Hero Image" class="shadow-2xl w-full h-full object-cover">
                         <?php else: ?>
-                            <!-- Fallback to existing image -->
-                            <?php if (file_exists('images/about-waste-management (2).jpg')): ?>
-                                <img src="images/about-waste-management (2).jpg" alt="<?php echo htmlspecialchars($company_settings['company_name']); ?> Hero Image" class="rounded-2xl shadow-2xl w-full max-w-lg mx-auto">
-                            <?php else: ?>
-                                <div class="bg-gray-200 rounded-2xl shadow-2xl w-full max-w-lg mx-auto h-96 flex items-center justify-center">
-                   
+                            <div class="bg-gray-200 shadow-2xl w-full h-full flex items-center justify-center">
                                 <div class="text-center">
-                                        <i class="fas fa-image text-black-400 text-6xl mb-4"></i>
-                                        <p class="text-gray-500">Upload a Hero image in Company Settings</p>
-                                    </div>
+                                    <i class="fas fa-image text-gray-400 text-6xl mb-4"></i>
+                                    <p class="text-gray-500">Upload a Hero image in Company Settings</p>
                                 </div>
-                            <?php endif; ?>
+                            </div>
                         <?php endif; ?>
-                        <div class="absolute -bottom-6 -right-6 bg-purple-600 text-white p-4 rounded-xl shadow-lg">
-                            <i class="fas fa-recycle text-3xl"></i>
-                        </div>
+                    <?php endif; ?>
+                    <div class="absolute -bottom-6 -right-6 bg-green-600 text-white p-4 rounded-xl shadow-lg">
+                        <i class="fas fa-recycle text-3xl"></i>
                     </div>
                 </div>
             </div>
         </div>
     </section>
+    <div class="my-4 flex justify-center">
+        <div class="w-3/4 border-t-4 border-green-300"></div>
+    </div>
 
     <!-- Features Section -->
-    <section id="features" class="py-16 bg-white">
-        <div class="container mx-auto px-4">
+    <section id="features" class="py-20 bg-white">
+        <div class="container mx-auto px-8 lg:px-32">
             <div class="text-center mb-12">
-                <h2 class="text-3xl font-bold text-gray-800 mb-4">Why Choose TrashSmart?</h2>
+                <h2 class="text-4xl font-extrabold text-gray-800 mb-4">Why Choose TrashSmart?</h2>
                 <p class="text-xl text-gray-600 max-w-3xl mx-auto">
                     Our platform brings together advanced technology and environmental consciousness to create the most efficient waste management solution.
                 </p>
             </div>
             
             <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
-                <div class="bg-green-50 rounded-xl p-6 hover:shadow-lg transition-all transform hover:-translate-y-2">
+                <div class="bg-green-50 rounded-xl p-6 hover:shadow-lg transition-all transform hover:-translate-y-2 h-72 aspect-square flex flex-col justify-between">
                     <div class="w-16 h-16 bg-green-600 rounded-xl flex items-center justify-center mb-4 mx-auto">
                         <i class="fas fa-clock text-white text-2xl"></i>
                     </div>
@@ -396,7 +397,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
                     <p class="text-gray-600 text-center">Schedule pickups anytime, anywhere with our round-the-clock service availability.</p>
                 </div>
                 
-                <div class="bg-blue-50 rounded-xl p-6 hover:shadow-lg transition-all transform hover:-translate-y-2">
+                <div class="bg-blue-50 rounded-xl p-6 hover:shadow-lg transition-all transform hover:-translate-y-2 h-72 aspect-square flex flex-col justify-between">
                     <div class="w-16 h-16 bg-blue-600 rounded-xl flex items-center justify-center mb-4 mx-auto">
                         <i class="fas fa-map-marker-alt text-white text-2xl"></i>
                     </div>
@@ -404,7 +405,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
                     <p class="text-gray-600 text-center">Track your waste collection requests in real-time and stay updated on pickup status.</p>
                 </div>
                 
-                <div class="bg-yellow-50 rounded-xl p-6 hover:shadow-lg transition-all transform hover:-translate-y-2">
+                <div class="bg-yellow-50 rounded-xl p-6 hover:shadow-lg transition-all transform hover:-translate-y-2 h-72 aspect-square flex flex-col justify-between">
                     <div class="w-16 h-16 bg-yellow-600 rounded-xl flex items-center justify-center mb-4 mx-auto">
                         <i class="fas fa-leaf text-white text-2xl"></i>
                     </div>
@@ -412,7 +413,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
                     <p class="text-gray-600 text-center">Contribute to environmental sustainability with our green waste management practices.</p>
                 </div>
                 
-                <div class="bg-purple-50 rounded-xl p-6 hover:shadow-lg transition-all transform hover:-translate-y-2">
+                <div class="bg-purple-50 rounded-xl p-6 hover:shadow-lg transition-all transform hover:-translate-y-2 h-72 aspect-square flex flex-col justify-between">
                     <div class="w-16 h-16 bg-purple-600 rounded-xl flex items-center justify-center mb-4 mx-auto">
                         <i class="fas fa-users text-white text-2xl"></i>
                     </div>
@@ -422,281 +423,220 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
             </div>
         </div>
     </section>
+    <div class="my-4 flex justify-center">
+        <div class="w-3/4 border-t-4 border-green-300"></div>
+    </div>
 
     <!-- Tips Section -->
-    <section id="tips" class="py-16 bg-gray-50">
-        <div class="container mx-auto px-4">
+    <!-- Tips Section -->
+    <section id="tips" class="py-20 bg-gray-50">
+        <div class="container mx-auto px-8 lg:px-32">
             <div class="text-center mb-12">
-                <h2 class="text-3xl font-bold text-gray-800 mb-4">Waste Management Tips</h2>
+                <h2 class="text-4xl font-extrabold text-gray-800 mb-4">Learn to Sort &amp; Recycle</h2>
                 <p class="text-xl text-gray-600 max-w-3xl mx-auto">
-                    Learn how to reduce, reuse, and recycle effectively for a more sustainable lifestyle.
+                    Discover the different types of waste and learn how to properly sort and recycle them for a cleaner environment.
                 </p>
             </div>
-            
-            <div class="grid md:grid-cols-3 gap-8">
-                <div class="bg-white rounded-xl p-6 shadow-md hover:shadow-lg transition-shadow">
-                    <div class="w-16 h-16 bg-red-100 rounded-xl flex items-center justify-center mb-4">
-                        <i class="fas fa-minus-circle text-red-600 text-2xl"></i>
+            <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
+                <div class="bg-green-50 rounded-xl p-6 hover:shadow-lg transition-all transform hover:-translate-y-2 h-72 aspect-square flex flex-col justify-between">
+                    <!-- Icon removed -->
+                    <h3 class="text-xl font-semibold text-gray-800 text-center mb-3">Organic Waste</h3>
+                    <p class="text-gray-600 text-center">Food scraps, garden waste, and biodegradable materials</p>
+                    <div class="bg-green-100 rounded-lg p-3 mt-2 flex items-center">
+                        <span class="text-2xl mr-2">💡</span>
+                        <span class="text-gray-700 text-sm">Compost your kitchen waste to create nutrient-rich soil for your garden.</span>
                     </div>
-                    <h3 class="text-xl font-semibold text-gray-800 mb-3">Reduce</h3>
-                    <p class="text-gray-600">Minimize waste by choosing products with less packaging and buying only what you need.</p>
                 </div>
-                
-                <div class="bg-white rounded-xl p-6 shadow-md hover:shadow-lg transition-shadow">
-                    <div class="w-16 h-16 bg-green-100 rounded-xl flex items-center justify-center mb-4">
-                        <i class="fas fa-redo text-green-600 text-2xl"></i>
+                <div class="bg-blue-50 rounded-xl p-6 hover:shadow-lg transition-all transform hover:-translate-y-2 h-72 aspect-square flex flex-col justify-between">
+                    <!-- Icon removed -->
+                    <h3 class="text-xl font-semibold text-gray-800 text-center mb-3">Plastic Waste</h3>
+                    <p class="text-gray-600 text-center">Bottles, containers, and plastic packaging</p>
+                    <div class="bg-blue-100 rounded-lg p-3 mt-2 flex items-center">
+                        <span class="text-2xl mr-2">💡</span>
+                        <span class="text-gray-700 text-sm">Rinse plastic bottles before recycling to prevent contamination.</span>
                     </div>
-                    <h3 class="text-xl font-semibold text-gray-800 mb-3">Reuse</h3>
-                    <p class="text-gray-600">Give items a second life by repurposing them creatively before throwing them away.</p>
                 </div>
-                
-                <div class="bg-white rounded-xl p-6 shadow-md hover:shadow-lg transition-shadow">
-                    <div class="w-16 h-16 bg-blue-100 rounded-xl flex items-center justify-center mb-4">
-                        <i class="fas fa-recycle text-blue-600 text-2xl"></i>
+                <div class="bg-yellow-50 rounded-xl p-6 hover:shadow-lg transition-all transform hover:-translate-y-2 h-72 aspect-square flex flex-col justify-between">
+                    <!-- Icon removed -->
+                    <h3 class="text-xl font-semibold text-gray-800 text-center mb-3">Paper Waste</h3>
+                    <p class="text-gray-600 text-center">Newspapers, cardboard, and paper products</p>
+                    <div class="bg-yellow-100 rounded-lg p-3 mt-2 flex items-center">
+                        <span class="text-2xl mr-2">💡</span>
+                        <span class="text-gray-700 text-sm">Flatten cardboard boxes to save space in recycling bins.</span>
                     </div>
-                    <h3 class="text-xl font-semibold text-gray-800 mb-3">Recycle</h3>
-                    <p class="text-gray-600">Sort your waste properly and ensure recyclable materials reach the right facilities.</p>
+                </div>
+                <div class="bg-purple-50 rounded-xl p-6 hover:shadow-lg transition-all transform hover:-translate-y-2 h-72 aspect-square flex flex-col justify-between">
+                    <!-- Icon removed -->
+                    <h3 class="text-xl font-semibold text-gray-800 text-center mb-3">Electronic Waste</h3>
+                    <p class="text-gray-600 text-center">Old electronics, batteries, and electrical items</p>
+                    <div class="bg-purple-100 rounded-lg p-3 mt-2 flex items-center">
+                        <span class="text-2xl mr-2">💡</span>
+                        <span class="text-gray-700 text-sm">Donate working electronics or use designated e-waste collection points.</span>
+                    </div>
                 </div>
             </div>
         </div>
     </section>
+    <div class="my-4 flex justify-center">
+        <div class="w-3/4 border-t-4 border-green-300"></div>
+    </div>
 
     <!-- About Section -->
-    <section id="about" class="py-16 bg-white">
-        <div class="container mx-auto px-4">
-            <div class="grid lg:grid-cols-2 gap-12 items-center">
-                <div>
-                    <h2 class="text-3xl font-bold text-gray-800 mb-6">About <?php echo htmlspecialchars($company_settings['company_name']); ?></h2>
-                    <p class="text-lg text-gray-600 mb-6 leading-relaxed">
-                        <?php echo nl2br(htmlspecialchars($company_settings['about_us'])); ?>
-                    </p>
-                    <?php if ($company_settings['mission']): ?>
-                    <div class="bg-green-50 border-l-4 border-green-500 p-4 mb-6">
-                        <h3 class="text-lg font-semibold text-gray-800 mb-2">Our Mission</h3>
-                        <p class="text-gray-600"><?php echo nl2br(htmlspecialchars($company_settings['mission'])); ?></p>
+    <!-- About Section -->
+<section id="about" class="py-20 bg-white">
+    <div class="container mx-auto px-8 lg:px-32">
+        <div class="text-center mb-12">
+            <h2 class="text-4xl font-extrabold text-gray-800 mb-4">About TrashSmart</h2>
+        </div>
+        <div class="grid lg:grid-cols-2 gap-12 items-center">
+            <div>
+                <p class="text-lg text-gray-600 mb-6 text-justify leading-relaxed">
+                    TrashSmart is dedicated to revolutionizing waste management for a cleaner, greener future. Our mission is to empower communities with smart solutions that make recycling and waste disposal easy, efficient, and environmentally friendly.
+                </p>
+                <div class="bg-green-50 border-l-4 border-green-500 p-4 mb-6">
+                    <h3 class="text-lg font-semibold text-gray-800 mb-2">Our Mission</h3>
+                    <p class="text-gray-600 text-justify">To provide innovative waste management services that promote sustainability and community well-being.</p>
+                </div>
+                <div class="grid grid-cols-2 gap-6">
+                    <div class="text-center">
+                        <div class="text-3xl font-bold text-green-600 mb-2">10K+</div>
+                        <div class="text-gray-600">Happy Citizens</div>
                     </div>
-                    <?php endif; ?>
-                    <div class="grid grid-cols-2 gap-6">
-                        <div class="text-center">
-                            <div class="text-3xl font-bold text-green-600 mb-2"><?php echo htmlspecialchars($company_settings['stat_citizens']); ?></div>
-                            <div class="text-gray-600">Happy Citizens</div>
-                        </div>
-                        <div class="text-center">
-                            <div class="text-3xl font-bold text-green-600 mb-2"><?php echo htmlspecialchars($company_settings['stat_pickups']); ?></div>
-                            <div class="text-gray-600">Pickups Completed</div>
-                        </div>
-                        <div class="text-center">
-                            <div class="text-3xl font-bold text-green-600 mb-2"><?php echo htmlspecialchars($company_settings['stat_partners']); ?></div>
-                            <div class="text-gray-600">Partner Organizations</div>
-                        </div>
-                        <div class="text-center">
-                            <div class="text-3xl font-bold text-green-600 mb-2"><?php echo htmlspecialchars($company_settings['stat_satisfaction']); ?></div>
-                            <div class="text-gray-600">Satisfaction Rate</div>
-                        </div>
+                    <div class="text-center">
+                        <div class="text-3xl font-bold text-green-600 mb-2">25K+</div>
+                        <div class="text-gray-600">Pickups Completed</div>
+                    </div>
+                    <div class="text-center">
+                        <div class="text-3xl font-bold text-green-600 mb-2">50+</div>
+                        <div class="text-gray-600">Partner Organizations</div>
+                    </div>
+                    <div class="text-center">
+                        <div class="text-3xl font-bold text-green-600 mb-2">95%</div>
+                        <div class="text-gray-600">Satisfaction Rate</div>
                     </div>
                 </div>
-                <div class="text-center">
-                    <?php if (!empty($company_settings['about_image']) && file_exists($company_settings['about_image'])): ?>
-                        <img src="<?php echo htmlspecialchars($company_settings['about_image']) . '?v=' . time(); ?>" alt="About <?php echo htmlspecialchars($company_settings['company_name']); ?>" class="rounded-2xl shadow-lg w-full max-w-lg mx-auto">
-                    <?php else: ?>
-                        <!-- Fallback to existing images or placeholder -->
-                        <?php if (file_exists('images/about-waste-management (2).jpg')): ?>
-                            <img src="images/about-waste-management (2).jpg" alt="About <?php echo htmlspecialchars($company_settings['company_name']); ?>" class="rounded-2xl shadow-lg w-full max-w-lg mx-auto">
-                        <?php else: ?>
-                            <div class="bg-gray-200 rounded-2xl shadow-lg w-full max-w-lg mx-auto h-96 flex items-center justify-center">
-                                <div class="text-center">
-                                    <i class="fas fa-image text-gray-400 text-6xl mb-4"></i>
-                                    <p class="text-gray-500">Upload an About Us image in Company Settings</p>
-                                </div>
-                            </div>
-                        <?php endif; ?>
-                    <?php endif; ?>
-                </div>
+            </div>
+            <div class="text-center">
+                <img src="images/about-us.jpg" alt="About TrashSmart" class="shadow-lg w-full max-w-xl h-[24rem] object-cover mx-auto">
             </div>
         </div>
-    </section>
+    </div>
+</section>
+    <div class="my-4 flex justify-center">
+        <div class="w-3/4 border-t-4 border-green-300"></div>
+    </div>
 
     <!-- Contact Section -->
-    <section id="contact" class="py-16 bg-gray-50">
-        <div class="container mx-auto px-4">
-            <div class="text-center mb-12">
-                <h2 class="text-3xl font-bold text-gray-800 mb-4">Contact Us</h2>
-                <p class="text-xl text-gray-600 max-w-3xl mx-auto">
-                    Have questions or suggestions? We'd love to hear from you. Reach out to our team anytime.
-                </p>
+    <!-- Contact Section -->
+    <section id="contact" class="pt-8 pb-20 bg-gray-50">
+        <div class="container mx-auto px-4 py-12">
+            <div class="text-center mb-10">
+                <h2 class="text-4xl font-extrabold text-gray-800 mb-4">Contact TrashSmart</h2>
+                <p class="text-xl text-gray-600 max-w-2xl mx-auto">Have questions or need assistance? Get in touch with our team.</p>
             </div>
-            
-            <div class="grid lg:grid-cols-2 gap-12">
-                <!-- Contact Info -->
-                <div class="space-y-8">
-                    <div class="flex items-start space-x-4">
-                        <div class="w-12 h-12 bg-green-600 rounded-lg flex items-center justify-center flex-shrink-0">
-                            <i class="fas fa-map-marker-alt text-white"></i>
+            <div class="flex flex-col lg:flex-row gap-12 items-center bg-white rounded-2xl shadow-lg p-6 w-full mx-auto mt-12">
+                <div class="flex-1 max-w-xs px-4 text-left flex flex-col justify-center">
+                    <div class="space-y-4">
+                        <div class="flex items-start space-x-2">
+                            <div class="w-8 h-8 bg-green-600 rounded-lg flex items-center justify-center flex-shrink-0">
+                                <i class="fas fa-map-marker-alt text-white text-base"></i>
+                            </div>
+                            <div>
+                                <h3 class="text-base font-semibold text-gray-800 mb-1">Address</h3>
+                                <p class="text-gray-600 text-sm"><?php echo nl2br(htmlspecialchars($company_settings['address'])); ?></p>
+                            </div>
                         </div>
-                        <div>
-                            <h3 class="text-lg font-semibold text-gray-800 mb-2">Address</h3>
-                            <p class="text-gray-600"><?php echo nl2br(htmlspecialchars($company_settings['address'])); ?></p>
+                        <div class="flex items-start space-x-2">
+                            <div class="w-8 h-8 bg-green-600 rounded-lg flex items-center justify-center flex-shrink-0">
+                                <i class="fas fa-phone text-white text-base"></i>
+                            </div>
+                            <div>
+                                <h3 class="text-base font-semibold text-gray-800 mb-1">Phone</h3>
+                                <p class="text-gray-600 text-sm"><?php echo htmlspecialchars($company_settings['phone']); ?></p>
+                            </div>
                         </div>
+                        <div class="flex items-start space-x-2">
+                            <div class="w-8 h-8 bg-green-600 rounded-lg flex items-center justify-center flex-shrink-0">
+                                <i class="fas fa-envelope text-white text-base"></i>
+                            </div>
+                            <div>
+                                <h3 class="text-base font-semibold text-gray-800 mb-1">Email</h3>
+                                <p class="text-gray-600 text-sm"><?php echo htmlspecialchars($company_settings['email']); ?></p>
+                            </div>
+                        </div>
+                        <?php if ($company_settings['social_facebook'] || $company_settings['social_twitter'] || $company_settings['social_instagram'] || $company_settings['social_linkedin']): ?>
+                        <div class="border-t pt-4">
+                            <h3 class="text-base font-semibold text-gray-800 mb-2">Follow Us</h3>
+                            <div class="flex space-x-2">
+                                <?php if ($company_settings['social_facebook']): ?>
+                                <a href="<?php echo htmlspecialchars($company_settings['social_facebook']); ?>" 
+                                   class="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center text-white hover:bg-blue-700 transition-colors">
+                                    <i class="fab fa-facebook-f"></i>
+                                </a>
+                                <?php endif; ?>
+                                <?php if ($company_settings['social_twitter']): ?>
+                                <a href="<?php echo htmlspecialchars($company_settings['social_twitter']); ?>" 
+                                   class="w-8 h-8 bg-blue-400 rounded-lg flex items-center justify-center text-white hover:bg-blue-500 transition-colors">
+                                    <i class="fab fa-twitter"></i>
+                                </a>
+                                <?php endif; ?>
+                                <?php if ($company_settings['social_instagram']): ?>
+                                <a href="<?php echo htmlspecialchars($company_settings['social_instagram']); ?>" 
+                                   class="w-8 h-8 bg-pink-600 rounded-lg flex items-center justify-center text-white hover:bg-pink-700 transition-colors">
+                                    <i class="fab fa-instagram"></i>
+                                </a>
+                                <?php endif; ?>
+                                <?php if ($company_settings['social_linkedin']): ?>
+                                <a href="<?php echo htmlspecialchars($company_settings['social_linkedin']); ?>" 
+                                   class="w-8 h-8 bg-blue-800 rounded-lg flex items-center justify-center text-white hover:bg-blue-900 transition-colors">
+                                    <i class="fab fa-linkedin-in"></i>
+                                </a>
+                                <?php endif; ?>
+                            </div>
+                        </div>
+                        <?php endif; ?>
                     </div>
-                    
-                    <div class="flex items-start space-x-4">
-                        <div class="w-12 h-12 bg-green-600 rounded-lg flex items-center justify-center flex-shrink-0">
-                            <i class="fas fa-phone text-white"></i>
-                        </div>
-                        <div>
-                            <h3 class="text-lg font-semibold text-gray-800 mb-2">Phone</h3>
-                            <p class="text-gray-600"><?php echo htmlspecialchars($company_settings['phone']); ?></p>
-                        </div>
-                    </div>
-                    
-                    <div class="flex items-start space-x-4">
-                        <div class="w-12 h-12 bg-green-600 rounded-lg flex items-center justify-center flex-shrink-0">
-                            <i class="fas fa-envelope text-white"></i>
-                        </div>
-                        <div>
-                            <h3 class="text-lg font-semibold text-gray-800 mb-2">Email</h3>
-                            <p class="text-gray-600"><?php echo htmlspecialchars($company_settings['email']); ?></p>
-                        </div>
-                    </div>
-                    
-                    <?php if ($company_settings['social_facebook'] || $company_settings['social_twitter'] || $company_settings['social_instagram'] || $company_settings['social_linkedin']): ?>
-                    <div class="border-t pt-8">
-                        <h3 class="text-lg font-semibold text-gray-800 mb-4">Follow Us</h3>
-                        <div class="flex space-x-4">
-                            <?php if ($company_settings['social_facebook']): ?>
-                            <a href="<?php echo htmlspecialchars($company_settings['social_facebook']); ?>" 
-                               class="w-10 h-10 bg-blue-600 rounded-lg flex items-center justify-center text-white hover:bg-blue-700 transition-colors">
-                                <i class="fab fa-facebook-f"></i>
-                            </a>
-                            <?php endif; ?>
-                            
-                            <?php if ($company_settings['social_twitter']): ?>
-                            <a href="<?php echo htmlspecialchars($company_settings['social_twitter']); ?>" 
-                               class="w-10 h-10 bg-blue-400 rounded-lg flex items-center justify-center text-white hover:bg-blue-500 transition-colors">
-                                <i class="fab fa-twitter"></i>
-                            </a>
-                            <?php endif; ?>
-                            
-                            <?php if ($company_settings['social_instagram']): ?>
-                            <a href="<?php echo htmlspecialchars($company_settings['social_instagram']); ?>" 
-                               class="w-10 h-10 bg-pink-600 rounded-lg flex items-center justify-center text-white hover:bg-pink-700 transition-colors">
-                                <i class="fab fa-instagram"></i>
-                            </a>
-                            <?php endif; ?>
-                            
-                            <?php if ($company_settings['social_linkedin']): ?>
-                            <a href="<?php echo htmlspecialchars($company_settings['social_linkedin']); ?>" 
-                               class="w-10 h-10 bg-blue-800 rounded-lg flex items-center justify-center text-white hover:bg-blue-900 transition-colors">
-                                <i class="fab fa-linkedin-in"></i>
-                            </a>
-                            <?php endif; ?>
-                        </div>
-                    </div>
-                    <?php endif; ?>
                 </div>
-                
-                <!-- Contact Form -->
-                <div class="bg-white rounded-xl p-8 shadow-md">
-                    <?php if (isset($contact_success)): ?>
+                <div class="flex-1 bg-white rounded-xl p-8 shadow-md flex items-center justify-center">
+                    <?php if (isset($_SESSION['contact_success'])): ?>
                         <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded mb-4">
-                            <?php echo htmlspecialchars($contact_success); ?>
+                            <?php echo htmlspecialchars($_SESSION['contact_success']); unset($_SESSION['contact_success']); ?>
                         </div>
                     <?php endif; ?>
-                    
-                    <?php if (isset($contact_error)): ?>
+                    <?php if (isset($_SESSION['contact_error'])): ?>
                         <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
-                            <?php echo htmlspecialchars($contact_error); ?>
+                            <?php echo htmlspecialchars($_SESSION['contact_error']); unset($_SESSION['contact_error']); ?>
                         </div>
                     <?php endif; ?>
-                    
-                    <form method="POST" class="space-y-6">
+                    <form method="POST" class="space-y-6 w-full max-w-md mx-auto">
                         <input type="hidden" name="action" value="contact">
-                        
                         <div>
                             <label for="contactName" class="block text-sm font-medium text-gray-700 mb-2">Name</label>
                             <input type="text" id="contactName" name="name" required 
                                    class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all">
                         </div>
-                        
                         <div>
                             <label for="contactEmail" class="block text-sm font-medium text-gray-700 mb-2">Email</label>
                             <input type="email" id="contactEmail" name="email" required 
                                    class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all">
                         </div>
-                        
                         <div>
                             <label for="contactMessage" class="block text-sm font-medium text-gray-700 mb-2">Message</label>
                             <textarea id="contactMessage" name="message" rows="4" required 
                                       class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all resize-none"></textarea>
                         </div>
-                        
                         <button type="submit" class="w-full bg-green-600 text-white py-3 rounded-lg hover:bg-green-700 transition-colors font-medium">
                             <i class="fas fa-paper-plane mr-2"></i>Send Message
                         </button>
                     </form>
                 </div>
+                <div class="flex-1 relative w-full h-[28rem] lg:h-[34rem] flex items-center justify-center">
+                    <img src="images/contact-waste-collection.jpg" alt="Contact Waste Collection" class="shadow-2xl w-full h-full object-cover rounded-2xl">
+                </div>
             </div>
         </div>
     </section>
 
-    <!-- Footer -->
-    <footer class="bg-gray-800 text-white py-8">
-        <div class="container mx-auto px-4">
-            <div class="grid md:grid-cols-4 gap-8">
-                <div class="col-span-2">
-                    <div class="flex items-center mb-4">
-                        <?php if (!empty($company_settings['company_logo']) && file_exists($company_settings['company_logo'])): ?>
-                            <img src="<?php echo htmlspecialchars($company_settings['company_logo']) . '?v=' . time(); ?>" alt="<?php echo htmlspecialchars($company_settings['company_name']); ?> Logo" class="h-8 w-auto mr-3">
-                        <?php else: ?>
-                            <img src="images/trash-smart-logo.jpg" alt="<?php echo htmlspecialchars($company_settings['company_name']); ?> Logo" class="h-8 w-auto mr-3">
-                        <?php endif; ?>
-                        <span class="text-xl font-bold"><?php echo htmlspecialchars($company_settings['company_name']); ?></span>
-                    </div>
-                    <p class="text-gray-400 mb-4"><?php echo htmlspecialchars($company_settings['about_us']); ?></p>
-                    <div class="flex space-x-4">
-                        <a href="#" class="text-gray-400 hover:text-white transition-colors">
-                            <i class="fab fa-facebook text-xl"></i>
-                        </a>
-                        <a href="#" class="text-gray-400 hover:text-white transition-colors">
-                            <i class="fab fa-twitter text-xl"></i>
-                        </a>
-                        <a href="#" class="text-gray-400 hover:text-white transition-colors">
-                            <i class="fab fa-instagram text-xl"></i>
-                        </a>
-                        <a href="#" class="text-gray-400 hover:text-white transition-colors">
-                            <i class="fab fa-linkedin text-xl"></i>
-                        </a>
-                    </div>
-                </div>
-                
-                <div>
-                    <h3 class="text-lg font-semibold mb-4">Quick Links</h3>
-                    <ul class="space-y-2">
-                        <li><a href="#home" class="text-gray-400 hover:text-white transition-colors">Home</a></li>
-                        <li><a href="#about" class="text-gray-400 hover:text-white transition-colors">About</a></li>
-                        <li><a href="#tips" class="text-gray-400 hover:text-white transition-colors">Tips</a></li>
-                        <li><a href="#contact" class="text-gray-400 hover:text-white transition-colors">Contact</a></li>
-                    </ul>
-                </div>
-                
-                <div>
-                    <h3 class="text-lg font-semibold mb-4">Services</h3>
-                    <ul class="space-y-2">
-                        <li><a href="#" class="text-gray-400 hover:text-white transition-colors">Waste Collection</a></li>
-                        <li><a href="#" class="text-gray-400 hover:text-white transition-colors">Recycling</a></li>
-                        <li><a href="#" class="text-gray-400 hover:text-white transition-colors">Composting</a></li>
-                        <li><a href="#" class="text-gray-400 hover:text-white transition-colors">Consultation</a></li>
-                    </ul>
-                </div>
-            </div>
-            
-            <div class="border-t border-gray-700 mt-8 pt-8 text-center">
-                <p class="text-gray-400">&copy; 2025 TrashSmart. All rights reserved.</p>
-            </div>
-        </div>
-    </footer>
-
-    <?php if (!isset($_SESSION['user_id'])): ?>
     <!-- Login Modal -->
     <div id="loginModal" class="fixed inset-0 bg-black bg-opacity-50 hidden z-50 flex items-center justify-center p-4">
         <div class="bg-white rounded-2xl p-8 max-w-md w-full max-h-[90vh] overflow-y-auto">
@@ -855,7 +795,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
             </div>
         </div>
     </div>
-    <?php endif; ?>
 
     <!-- Custom JavaScript -->
     <script src="js/main.js"></script>
@@ -873,5 +812,61 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
         document.getElementById('signupModal').classList.remove('hidden');
     </script>
     <?php endif; ?>
+
+    <!-- Footer -->
+    <footer class="bg-green-100 text-black py-6 mt-8">
+        <div class="container mx-auto px-6">
+            <div class="grid md:grid-cols-4 gap-6">
+                <div class="col-span-2">
+                    <div class="flex items-center mb-3">
+                        <?php if (!empty($company_settings['company_logo']) && file_exists($company_settings['company_logo'])): ?>
+                            <img src="<?php echo htmlspecialchars($company_settings['company_logo']) . '?v=' . time(); ?>" alt="<?php echo htmlspecialchars($company_settings['company_name']); ?> Logo" class="h-8 w-auto mr-2">
+                        <?php else: ?>
+                            <img src="images/trash-smart-logo.jpg" alt="<?php echo htmlspecialchars($company_settings['company_name']); ?> Logo" class="h-8 w-auto mr-2">
+                        <?php endif; ?>
+                    </div>
+                    <p class="text-black mb-3 text-sm text-justify leading-relaxed max-w-md" style="max-width:20rem;"><?php echo htmlspecialchars($company_settings['about_us']); ?></p>
+                    <div class="flex space-x-4 mt-1">
+                        <a href="#" class="text-black hover:text-white transition-colors">
+                            <i class="fab fa-facebook text-2xl"></i>
+                        </a>
+                        <a href="#" class="text-black hover:text-white transition-colors">
+                            <i class="fab fa-twitter text-2xl"></i>
+                        </a>
+                        <a href="#" class="text-black hover:text-white transition-colors">
+                            <i class="fab fa-instagram text-2xl"></i>
+                        </a>
+                        <a href="#" class="text-black hover:text-white transition-colors">
+                            <i class="fab fa-linkedin text-2xl"></i>
+                        </a>
+                    </div>
+                </div>
+
+                <div>
+                    <h3 class="text-base font-semibold mb-3">Quick Links</h3>
+                    <ul class="space-y-2">
+                        <li><a href="#home" class="text-black hover:text-white transition-colors">Home</a></li>
+                        <li><a href="#about" class="text-black hover:text-white transition-colors">About</a></li>
+                        <li><a href="#tips" class="text-black hover:text-white transition-colors">Tips</a></li>
+                        <li><a href="#contact" class="text-black hover:text-white transition-colors">Contact</a></li>
+                    </ul>
+                </div>
+
+                <div>
+                    <h3 class="text-base font-semibold mb-3">Services</h3>
+                    <ul class="space-y-2">
+                        <li><a href="#" class="text-black hover:text-white transition-colors">Waste Collection</a></li>
+                        <li><a href="#" class="text-black hover:text-white transition-colors">Recycling</a></li>
+                        <li><a href="#" class="text-black hover:text-white transition-colors">Composting</a></li>
+                        <li><a href="#" class="text-black hover:text-white transition-colors">Consultation</a></li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="border-t border-green-800 mt-6 pt-4 text-center">
+                <p class="text-black text-sm">&copy; 2025 TrashSmart. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
 </body>
 </html>
