@@ -360,14 +360,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
                                 <img src="images/about-waste-management (2).jpg" alt="<?php echo htmlspecialchars($company_settings['company_name']); ?> Hero Image" class="rounded-2xl shadow-2xl w-full max-w-lg mx-auto">
                             <?php else: ?>
                                 <div class="bg-gray-200 rounded-2xl shadow-2xl w-full max-w-lg mx-auto h-96 flex items-center justify-center">
-                                    <div class="text-center">
+                   
+                                <div class="text-center">
                                         <i class="fas fa-image text-gray-400 text-6xl mb-4"></i>
                                         <p class="text-gray-500">Upload a Hero image in Company Settings</p>
                                     </div>
                                 </div>
                             <?php endif; ?>
                         <?php endif; ?>
-                        <div class="absolute -bottom-6 -right-6 bg-green-600 text-white p-4 rounded-xl shadow-lg">
+                        <div class="absolute -bottom-6 -right-6 bg-blue-600 text-white p-4 rounded-xl shadow-lg">
                             <i class="fas fa-recycle text-3xl"></i>
                         </div>
                     </div>
