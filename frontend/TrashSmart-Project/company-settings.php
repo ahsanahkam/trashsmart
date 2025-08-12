@@ -233,7 +233,7 @@ $adminName = $_SESSION['user_name'] ?? 'Admin';
     <!-- Font Awesome for icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
-<body class="font-poppins bg-gray-50">
+<body class="font-poppins bg-gray-50 text-base md:text-lg">
     
     <!-- Header Section -->
     <header class="fixed top-0 left-0 right-0 bg-white shadow-md z-50">
@@ -300,8 +300,8 @@ $adminName = $_SESSION['user_name'] ?? 'Admin';
             <div class="bg-white rounded-2xl shadow-md p-6 mb-8">
                 <div class="flex items-center justify-between">
                     <div>
-                        <h1 class="text-4xl font-bold text-gray-800 mb-2">Company Settings</h1>
-                        <p class="text-lg text-gray-600">Customize company information, about us content, and contact details</p>
+                        <h1 class="text-3xl md:text-4xl font-extrabold text-gray-800 mb-4">Company Settings</h1>
+                        <p class="text-lg text-gray-700 mb-2">Customize company information, about us content, and contact details</p>
                     </div>
                     <div class="hidden md:block">
                         <i class="fas fa-building text-6xl text-blue-600"></i>
@@ -312,7 +312,7 @@ $adminName = $_SESSION['user_name'] ?? 'Admin';
             <!-- Company Settings Form -->
             <div class="bg-white rounded-xl shadow-md overflow-hidden">
                 <div class="p-6 border-b border-gray-200">
-                    <h3 class="text-lg font-semibold text-gray-800">
+                    <h3 class="text-2xl font-bold text-gray-800 mb-2">
                         <i class="fas fa-edit text-blue-600 mr-2"></i>
                         Update Company Information
                     </h3>
@@ -327,16 +327,16 @@ $adminName = $_SESSION['user_name'] ?? 'Admin';
                     
                     <!-- Images Management Section -->
                     <div class="bg-blue-50 rounded-xl p-6 mb-8">
-                        <h4 class="text-xl font-bold text-gray-800 mb-6 flex items-center">
+                        <h4 class="text-2xl font-bold text-gray-800 mb-6 flex items-center">
                             <i class="fas fa-images text-blue-600 mr-3"></i>
                             Image Management
                         </h4>
-                        <p class="text-gray-600 mb-6">Upload and manage images for your website's visual content</p>
+                        <p class="text-lg text-gray-600 mb-6">Upload and manage images for your website's visual content</p>
                         
                         <div class="grid lg:grid-cols-2 gap-8">
                             <!-- Company Logo Upload -->
                             <div class="bg-white rounded-lg p-6 shadow-sm">
-                                <h5 class="text-lg font-semibold text-gray-800 mb-4">Company Logo</h5>
+                                <h5 class="text-xl font-bold text-gray-800 mb-4">Company Logo</h5>
                                 
                                 <div class="flex flex-col items-center space-y-4">
                                     <?php if (!empty($settings['company_logo_url']) && file_exists($settings['company_logo_url'])): ?>
@@ -367,7 +367,7 @@ $adminName = $_SESSION['user_name'] ?? 'Admin';
                             
                             <!-- Hero Section Image Upload -->
                             <div class="bg-white rounded-lg p-6 shadow-sm">
-                                <h5 class="text-lg font-semibold text-gray-800 mb-4">Hero Section Image</h5>
+                                <h5 class="text-xl font-bold text-gray-800 mb-4">Hero Section Image</h5>
                                 
                                 <div class="flex flex-col items-center space-y-4">
                                     <?php if (!empty($settings['hero_image_url']) && file_exists($settings['hero_image_url'])): ?>
@@ -399,7 +399,7 @@ $adminName = $_SESSION['user_name'] ?? 'Admin';
                         
                         <!-- About Us Image Upload -->
                         <div class="bg-white rounded-lg p-6 shadow-sm mt-6">
-                            <h5 class="text-lg font-semibold text-gray-800 mb-4">About Us Section Image</h5>
+                            <h5 class="text-xl font-bold text-gray-800 mb-4">About Us Section Image</h5>
                             
                             <div class="flex items-center space-x-6">
                                 <?php if (!empty($settings['about_us_image_url']) && file_exists($settings['about_us_image_url'])): ?>
@@ -487,7 +487,7 @@ $adminName = $_SESSION['user_name'] ?? 'Admin';
                     
                     <!-- About Us Content -->
                     <div class="mb-8">
-                        <h4 class="text-lg font-semibold text-gray-800 mb-4">About Us Content</h4>
+                        <h4 class="text-xl font-bold text-gray-800 mb-4">About Us Content</h4>
                         
                         <div class="mb-6">
                             <label for="company_description" class="block text-sm font-medium text-gray-700 mb-2">
@@ -510,7 +510,7 @@ $adminName = $_SESSION['user_name'] ?? 'Admin';
                     
                     <!-- Contact Information -->
                     <div class="mb-8">
-                        <h4 class="text-lg font-semibold text-gray-800 mb-4">Contact Information</h4>
+                        <h4 class="text-xl font-bold text-gray-800 mb-4">Contact Information</h4>
                         
                         <div class="grid md:grid-cols-2 gap-6">
                             <div>
@@ -545,7 +545,7 @@ $adminName = $_SESSION['user_name'] ?? 'Admin';
                     <!-- Social Media Links -->
                     <div class="mb-8">
                         <div class="flex items-center justify-between mb-4">
-                            <h4 class="text-lg font-semibold text-gray-800">Social Media Links</h4>
+                            <h4 class="text-xl font-bold text-gray-800">Social Media Links</h4>
                             <span class="text-sm text-gray-500 bg-gray-100 px-3 py-1 rounded-full">All Optional</span>
                         </div>
                         
