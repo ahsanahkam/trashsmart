@@ -5,7 +5,11 @@
  */
 
 session_start();
-require_once 'config/dataybase.php';
+
+require_once 'config/database.php';
+
+
+
 
 $error = '';
 
