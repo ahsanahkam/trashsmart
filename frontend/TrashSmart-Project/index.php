@@ -253,7 +253,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
     <!-- Font Awesome for icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
-<body class="font-poppins bg-white text-base md:text-lg">
+<body class="font-poppins bg-white text-sm md:text-base">
     
     <!-- Header Section -->
     <header class="fixed top-0 left-0 right-0 bg-white shadow-md z-50">
@@ -393,37 +393,32 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
             </div>
             
             <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
-
-                <div class="bg-green-50 rounded-xl p-6 hover:shadow-lg transition-all transform hover:-translate-y-2 h-60 w-60 flex flex-col justify-between mx-auto">
+                <div class="bg-green-50 rounded-xl p-6 hover:shadow-lg transition-all transform hover:-translate-y-2 h-72 aspect-square flex flex-col justify-between mx-auto">
                     <div class="w-14 h-14 bg-green-600 rounded-xl flex items-center justify-center mb-4 mx-auto">
                         <i class="fas fa-clock text-white text-2xl"></i>
                     </div>
                     <h3 class="text-xl font-semibold text-black text-center mb-3">24/7 Service</h3>
                     <p class="text-gray-600 text-center">Schedule pickups anytime, anywhere with our round-the-clock service availability.</p>
                 </div>
-                
-                <div class="bg-blue-50 rounded-xl p-6 hover:shadow-lg transition-all transform hover:-translate-y-2 h-60 w-60 flex flex-col justify-between mx-auto">
+                <div class="bg-blue-50 rounded-xl p-6 hover:shadow-lg transition-all transform hover:-translate-y-2 h-72 aspect-square flex flex-col justify-between mx-auto">
                     <div class="w-14 h-14 bg-blue-600 rounded-xl flex items-center justify-center mb-4 mx-auto">
                         <i class="fas fa-map-marker-alt text-white text-2xl"></i>
                     </div>
                     <h3 class="text-xl font-semibold text-black text-center mb-3">Real-time Tracking</h3>
                     <p class="text-gray-600 text-center">Track your waste collection requests in real-time and stay updated on pickup status.</p>
                 </div>
-                
-                <div class="bg-yellow-50 rounded-xl p-6 hover:shadow-lg transition-all transform hover:-translate-y-2 h-60 w-60 flex flex-col justify-between mx-auto">
+                <div class="bg-yellow-50 rounded-xl p-6 hover:shadow-lg transition-all transform hover:-translate-y-2 h-72 aspect-square flex flex-col justify-between mx-auto">
                     <div class="w-14 h-14 bg-yellow-600 rounded-xl flex items-center justify-center mb-4 mx-auto">
                         <i class="fas fa-leaf text-white text-2xl"></i>
                     </div>
                     <h3 class="text-xl font-semibold text-black text-center mb-3">Eco-Friendly</h3>
                     <p class="text-gray-600 text-center">Contribute to environmental sustainability with our green waste management practices.</p>
                 </div>
-                
-                <div class="bg-purple-50 rounded-xl p-6 hover:shadow-lg transition-all transform hover:-translate-y-2 h-60 w-60 flex flex-col justify-between mx-auto">
+                <div class="bg-purple-50 rounded-xl p-6 hover:shadow-lg transition-all transform hover:-translate-y-2 h-72 aspect-square flex flex-col justify-between mx-auto">
                     <div class="w-14 h-14 bg-purple-600 rounded-xl flex items-center justify-center mb-4 mx-auto">
                         <i class="fas fa-users text-white text-2xl"></i>
                     </div>
                     <h3 class="text-xl font-semibold text-black text-center mb-3">Community Driven</h3>
-
                     <p class="text-gray-600 text-center">Join a community of environmentally conscious citizens working towards a cleaner future.</p>
                 </div>
             </div>

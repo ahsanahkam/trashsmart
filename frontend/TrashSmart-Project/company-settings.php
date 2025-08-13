@@ -245,8 +245,8 @@ $adminName = $_SESSION['user_name'] ?? 'Admin';
                     <span class="ml-3 text-2xl font-bold text-gray-800">Admin Panel</span>
                 </div>
                 <div class="hidden md:flex space-x-6">
-                    <a href="admin-dashboard.php" class="nav-link text-base text-green-600 font-semibold">Dashboard</a>
-                    <a href="admin-management.php" class="nav-link text-base text-gray-700 hover:text-green-600 transition-colors">User Management</a>
+                    <a href="admin-dashboard.php" class="nav-link text-base text-gray-700 hover:text-green-600 font-semibold">Dashboard</a>
+                    <a href="admin-management.php" class="nav-link text-base text-gray-700 hover:text-green-600 transition-colors">Citizen Management</a>
                     <a href="company-settings.php" class="nav-link text-base text-green-600 font-semibold">Company Settings</a>
                 </div>
                 <div class="flex items-center space-x-4">
@@ -597,11 +597,11 @@ $adminName = $_SESSION['user_name'] ?? 'Admin';
                     <div class="flex justify-center space-x-4 mt-8">
                         <a href="admin-management.php" 
                            class="px-6 py-3 bg-gray-500 text-white rounded-lg hover:bg-gray-600 transition-colors">
-                            <i class="fas fa-arrow-left mr-2"></i>Back to User Management
+                            <i class="fas fa-arrow-left mr-2"></i><span class="text-sm">Back to Citizen Management</span>
                         </a>
                         <button type="submit" 
-                                class="px-6 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors">
-                            <i class="fas fa-save mr-2"></i>Save Settings
+                                class="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition-colors text-sm font-medium flex items-center">
+                            <i class="fas fa-save mr-2"></i>Save Changes
                         </button>
                     </div>
                 </form>

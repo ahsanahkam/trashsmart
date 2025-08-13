@@ -547,7 +547,7 @@ $conn->close();
             <div class="bg-white rounded-2xl shadow-md p-8 mb-12">
                 <div class="flex items-center justify-between">
                     <div class="flex-1">
-                        <h2 class="text-2xl md:text-4xl font-bold text-gray-800 mb-4">Welcome to Your Dashboard</h2>
+                        <h2 class="text-2xl md:text-4xl font-bold text-gray-800 mb-4">Welcome to Your Profile</h2>
                         <p class="text-base md:text-lg text-gray-700 mb-6">Hello <?php 
                             if ($user_profile && !empty($user_profile['first_name'])) {
                                 echo htmlspecialchars($user_profile['first_name'] . ' ' . $user_profile['last_name']);
@@ -561,32 +561,29 @@ $conn->close();
                             <h3 class="text-2xl font-bold text-gray-800 mb-6">
                                 <i class="fas fa-user text-green-600 mr-2"></i>Profile Information
                             </h3>
-                            
-                            <!-- Photo + Actions -->
-                            <div class="flex items-center justify-between mb-6 gap-4 flex-col sm:flex-row">
-                                <div class="flex items-center gap-4">
-                                    <img src="<?php echo htmlspecialchars($profilePhotoUrl); ?>" alt="Profile Photo" class="w-20 h-20 rounded-full object-cover border border-gray-200">
-                                    <div>
-                                        <p class="text-sm text-gray-500">Profile Photo</p>
-                                        <p class="text-xs text-gray-400">JPG/PNG/WEBP up to 2MB</p>
-                                    </div>
-                                </div>
-                                <div class="flex flex-wrap gap-2">
-                                    <button type="button" onclick="openProfileModal()" class="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition-colors text-sm font-medium">
-                                        <i class="fas fa-user-edit mr-2"></i>Update Profile
+                            <div class="flex flex-wrap gap-2 mb-6">
+                                <button type="button" onclick="openProfileModal()" class="bg-green-600 text-white px-3 py-2 rounded-lg hover:bg-green-700 transition-colors text-sm font-medium">
+                                    <i class="fas fa-user-edit mr-2"></i>Update Profile
+                                </button>
+                                <form method="POST" onsubmit="return confirmRemovePhoto();">
+                                    <input type="hidden" name="action" value="remove_profile_photo">
+                                    <button type="submit" class="bg-gray-600 text-white px-3 py-2 rounded-lg hover:bg-gray-700 transition-colors text-sm font-medium">
+                                        <i class="fas fa-image mr-2"></i>Remove Photo
                                     </button>
-                                    <form method="POST" onsubmit="return confirmRemovePhoto();">
-                                        <input type="hidden" name="action" value="remove_profile_photo">
-                                        <button type="submit" class="bg-gray-600 text-white px-4 py-2 rounded-lg hover:bg-gray-700 transition-colors text-sm font-medium">
-                                            <i class="fas fa-image mr-2"></i>Remove Photo
-                                        </button>
-                                    </form>
-                                    <form method="POST" onsubmit="return confirmDeleteProfile();">
-                                        <input type="hidden" name="action" value="delete_profile">
-                                        <button type="submit" class="bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700 transition-colors text-sm font-medium">
-                                            <i class="fas fa-user-times mr-2"></i>Delete Account
-                                        </button>
-                                    </form>
+                                </form>
+                                <form method="POST" onsubmit="return confirmDeleteProfile();">
+                                    <input type="hidden" name="action" value="delete_profile">
+                                    <button type="submit" class="bg-brown-600 text-white px-3 py-2 rounded-lg hover:bg-brown-700 transition-colors text-sm font-medium">
+                                        <i class="fas fa-user-times mr-2"></i>Delete Account
+                                    </button>
+                                </form>
+                            </div>
+                            
+                            <div class="flex items-center gap-4 mb-6">
+                                <img src="<?php echo htmlspecialchars($profilePhotoUrl); ?>" alt="Profile Photo" class="w-20 h-20 rounded-full object-cover border border-gray-200">
+                                <div>
+                                    <p class="text-sm text-gray-500">Profile Photo</p>
+                                    <p class="text-xs text-gray-400">JPG/PNG/WEBP up to 2MB</p>
                                 </div>
                             </div>
 
@@ -779,11 +776,10 @@ $conn->close();
                     <!-- Form Actions -->
 
                     <div class="flex flex-col sm:flex-row gap-4 pt-4 justify-center">
-                        <button type="submit" class="flex-1 bg-green-600 text-white py-3 px-6 rounded-lg hover:bg-green-700 transition-colors font-medium">
-
+                        <button type="submit" class="w-48 bg-green-600 text-white py-2 px-4 rounded-lg hover:bg-green-700 transition-colors text-sm font-medium">
                             <i class="fas fa-paper-plane mr-2"></i>Submit Request
                         </button>
-                        <button type="reset" class="flex-1 bg-gray-600 text-white py-4 px-8 rounded-lg hover:bg-gray-700 transition-colors font-semibold text-lg">
+                        <button type="reset" class="w-48 bg-gray-600 text-white py-2 px-4 rounded-lg hover:bg-gray-700 transition-colors text-sm font-medium">
                             <i class="fas fa-times mr-2"></i>Clear Form
                         </button>
                     </div>
