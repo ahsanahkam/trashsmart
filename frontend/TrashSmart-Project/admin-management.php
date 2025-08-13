@@ -21,10 +21,22 @@ function getDatabaseConnection() {
     return $conn;
 }
 
+// Helper: check if a column exists in a table (used for replied status compatibility)
+function columnExists($conn, $table, $column) {
+    // Escape identifiers (table/column) for safety
+    $table = preg_replace('/[^a-zA-Z0-9_]/', '', $table);
+    $column = preg_replace('/[^a-zA-Z0-9_]/', '', $column);
+    $sql = "SHOW COLUMNS FROM `{$table}` LIKE '{$column}'";
+    $result = $conn->query($sql);
+    $exists = $result && $result->num_rows > 0;
+    if ($result) $result->free();
+    return $exists;
+}
+
 $success_message = '';
 $error_message = '';
 
-// Handle status update actions
+// Handle status update actions and contact message actions
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
     $conn = getDatabaseConnection();
     
@@ -72,6 +84,72 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
             $success_message = "User deleted successfully!";
         } else {
             $error_message = "Failed to delete user.";
+        }
+        $stmt->close();
+    }
+    
+    // Mark contact message as replied
+    if ($_POST['action'] === 'mark_contact_replied' && isset($_POST['message_id'])) {
+        $message_id = intval($_POST['message_id']);
+        // Detect id field (id or message_id)
+        $idField = 'id';
+        $idCheck = $conn->query("SHOW COLUMNS FROM contact_messages LIKE 'id'");
+        if (!$idCheck || $idCheck->num_rows === 0) {
+            $idField = 'message_id';
+        }
+        if ($idCheck) $idCheck->free();
+        // Prefer boolean replied flag if exists, else fallback to status text
+        if (columnExists($conn, 'contact_messages', 'replied')) {
+            $stmt = $conn->prepare("UPDATE contact_messages SET replied = 1, replied_at = NOW() WHERE $idField = ?");
+            $stmt->bind_param("i", $message_id);
+        } elseif (columnExists($conn, 'contact_messages', 'status')) {
+            $status = 'replied';
+            // replied_at column may not exist; update only status if replied_at missing
+            if (columnExists($conn, 'contact_messages', 'replied_at')) {
+                $stmt = $conn->prepare("UPDATE contact_messages SET status = ?, replied_at = NOW() WHERE $idField = ?");
+                $stmt->bind_param("si", $status, $message_id);
+            } else {
+                $stmt = $conn->prepare("UPDATE contact_messages SET status = ? WHERE $idField = ?");
+                $stmt->bind_param("si", $status, $message_id);
+            }
+        } else {
+            // Add status column if missing, then update
+            $alter = $conn->query("ALTER TABLE contact_messages ADD COLUMN status VARCHAR(20) NOT NULL DEFAULT 'not_replied'");
+            if ($alter) {
+                $status = 'replied';
+                $stmt = $conn->prepare("UPDATE contact_messages SET status = ? WHERE $idField = ?");
+                $stmt->bind_param("si", $status, $message_id);
+            } else {
+                $stmt = null;
+                $error_message = "Could not add status column to contact messages table.";
+            }
+        }
+        if ($stmt) {
+            if ($stmt->execute()) {
+                $success_message = "Message marked as replied.";
+            } else {
+                $error_message = "Failed to mark message as replied.";
+            }
+            $stmt->close();
+        }
+    }
+    
+    // Delete contact message
+    if ($_POST['action'] === 'delete_contact_message' && isset($_POST['message_id'])) {
+        $message_id = intval($_POST['message_id']);
+        // Detect id field (id or message_id)
+        $idField = 'id';
+        $idCheck = $conn->query("SHOW COLUMNS FROM contact_messages LIKE 'id'");
+        if (!$idCheck || $idCheck->num_rows === 0) {
+            $idField = 'message_id';
+        }
+        if ($idCheck) $idCheck->free();
+        $stmt = $conn->prepare("DELETE FROM contact_messages WHERE $idField = ?");
+        $stmt->bind_param("i", $message_id);
+        if ($stmt->execute()) {
+            $success_message = "Message deleted successfully.";
+        } else {
+            $error_message = "Failed to delete message.";
         }
         $stmt->close();
     }
@@ -168,6 +246,24 @@ $conn->close();
 
 // Get admin information from session
 $adminName = $_SESSION['user_name'] ?? 'Admin';
+
+// Fetch contact messages for admin view
+$conn = getDatabaseConnection();
+$messages = [];
+$idField = 'id';
+$query = "SELECT * FROM contact_messages ORDER BY created_at DESC";
+$result = $conn->query($query);
+if ($result) {
+    while ($row = $result->fetch_assoc()) {
+        $messages[] = $row;
+    }
+    // Try to detect id field gracefully
+    if (!empty($messages)) {
+        if (array_key_exists('id', $messages[0])) { $idField = 'id'; }
+        elseif (array_key_exists('message_id', $messages[0])) { $idField = 'message_id'; }
+    }
+}
+$conn->close();
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -485,6 +581,91 @@ $adminName = $_SESSION['user_name'] ?? 'Admin';
                 <?php endif; ?>
             </div>
 
+            <!-- Contact Messages Section -->
+            <div class="bg-white rounded-xl shadow-md overflow-hidden mb-12">
+                <div class="p-6 border-b border-gray-200">
+                    <h3 class="text-2xl font-semibold text-gray-800">
+                        <i class="fas fa-envelope text-green-600 mr-2"></i>Contact Messages
+                        <span class="text-lg text-gray-500 ml-2">(<?php echo count($messages); ?> records)</span>
+                    </h3>
+                </div>
+                <?php if (empty($messages)): ?>
+                    <div class="text-center py-12">
+                        <i class="fas fa-inbox text-4xl text-gray-400 mb-4"></i>
+                        <h4 class="text-lg font-medium text-gray-600 mb-2">No messages found</h4>
+                        <p class="text-gray-500">Messages submitted via Contact Us will appear here.</p>
+                    </div>
+                <?php else: ?>
+                    <div class="overflow-x-auto">
+                        <table class="min-w-full divide-y divide-gray-200">
+                            <thead class="bg-gray-50">
+                                <tr>
+                                    <th class="px-6 py-3 text-left text-sm font-semibold text-gray-600 uppercase tracking-wider">#</th>
+                                    <th class="px-6 py-3 text-left text-sm font-semibold text-gray-600 uppercase tracking-wider">Sender</th>
+                                    <th class="px-6 py-3 text-left text-sm font-semibold text-gray-600 uppercase tracking-wider">Contact</th>
+                                    <th class="px-6 py-3 text-left text-sm font-semibold text-gray-600 uppercase tracking-wider">Message</th>
+                                    <th class="px-6 py-3 text-left text-sm font-semibold text-gray-600 uppercase tracking-wider">Submitted</th>
+                                    <th class="px-6 py-3 text-left text-sm font-semibold text-gray-600 uppercase tracking-wider">Status</th>
+                                    <th class="px-6 py-3 text-left text-sm font-semibold text-gray-600 uppercase tracking-wider">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody class="bg-white divide-y divide-gray-200">
+                                <?php foreach ($messages as $m): ?>
+                                    <?php
+                                        $idVal = $m[$idField];
+                                        $name = htmlspecialchars($m['name'] ?? '');
+                                        $email = htmlspecialchars($m['email'] ?? '');
+                                        $messageText = htmlspecialchars($m['message'] ?? '');
+                                        $createdAt = isset($m['created_at']) ? date('M j, Y g:i A', strtotime($m['created_at'])) : '';
+                                        $replied = false;
+                                        if (array_key_exists('replied', $m)) { $replied = (bool)$m['replied']; }
+                                        elseif (array_key_exists('status', $m)) { $replied = strtolower((string)$m['status']) === 'replied'; }
+                                        $badgeClass = $replied ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800';
+                                        $badgeText = $replied ? 'Replied' : 'Not Replied';
+                                    ?>
+                                    <tr class="hover:bg-gray-50">
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">#<?php echo $idVal; ?></td>
+                                        <td class="px-6 py-4 whitespace-nowrap">
+                                            <div class="text-base font-medium text-gray-900"><?php echo $name; ?></div>
+                                        </td>
+                                        <td class="px-6 py-4 whitespace-nowrap">
+                                            <div class="text-sm text-gray-900"><?php echo $email; ?></div>
+                                        </td>
+                                        <td class="px-6 py-4">
+                                            <div class="text-sm text-gray-700 max-w-xl break-words overflow-hidden" title="<?php echo $messageText; ?>"><?php echo $messageText; ?></div>
+                                        </td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900"><?php echo $createdAt; ?></td>
+                                        <td class="px-6 py-4 whitespace-nowrap">
+                                            <span class="inline-flex px-2 py-1 text-xs font-semibold rounded-full <?php echo $badgeClass; ?>"><?php echo $badgeText; ?></span>
+                                        </td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                                            <div class="flex space-x-2">
+                                                <?php if (!$replied): ?>
+                                                <form method="POST" class="inline-block">
+                                                    <input type="hidden" name="action" value="mark_contact_replied">
+                                                    <input type="hidden" name="message_id" value="<?php echo $idVal; ?>">
+                                                    <button type="submit" class="flex items-center px-3 py-1 bg-green-600 hover:bg-green-700 text-white rounded-md shadow-sm transition text-base font-semibold" title="Mark as Replied">
+                                                        <i class="fas fa-check-circle text-xl mr-2"></i>
+                                                        <span>Mark as Replied</span>
+                                                    </button>
+                                                </form>
+                                                <?php endif; ?>
+                                                <form method="POST" class="inline-block" onsubmit="return confirm('Delete this message? This cannot be undone.')">
+                                                    <input type="hidden" name="action" value="delete_contact_message">
+                                                    <input type="hidden" name="message_id" value="<?php echo $idVal; ?>">
+                                                    <button type="submit" class="text-red-600 hover:text-red-800" title="Delete Message">
+                                                        <i class="fas fa-trash"></i>
+                                                    </button>
+                                                </form>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                <?php endforeach; ?>
+                            </tbody>
+                        </table>
+                    </div>
+                <?php endif; ?>
+            </div>
         </div>
     </main>
 
