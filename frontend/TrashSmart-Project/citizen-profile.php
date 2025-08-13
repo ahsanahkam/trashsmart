@@ -289,7 +289,7 @@ $conn->close();
 
     <!-- Main Content -->
     <main class="pt-24 pb-12 bg-gray-50 min-h-screen">
-        <div class="container mx-auto px-12">
+        <div class="container mx-auto px-8 md:px-16 lg:px-32">
             
             <!-- Success/Error Messages -->
             <?php if ($success_message): ?>
@@ -323,7 +323,7 @@ $conn->close();
             <?php endif; ?>
             
             <!-- Welcome Section -->
-            <div class="bg-white rounded-2xl shadow-md p-8 mb-8">
+            <div class="bg-white rounded-2xl shadow-md p-8 mb-12">
                 <div class="flex items-center justify-between">
                     <div class="flex-1">
                         <h1 class="text-3xl font-bold text-gray-800 mb-2">Welcome to Your Dashboard</h1>
@@ -392,45 +392,43 @@ $conn->close();
             </div>
 
             <!-- Quick Stats -->
-            <div class="grid md:grid-cols-4 gap-6 mb-8">
-                <div class="bg-white rounded-xl shadow-md p-6 text-center">
+            <div class="grid md:grid-cols-4 gap-8 mb-12">
+                <div class="bg-white rounded-xl shadow-md p-6 w-full max-w-xs mx-auto flex flex-col items-center justify-center aspect-square">
                     <i class="fas fa-clock text-3xl text-yellow-600 mb-3"></i>
                     <h3 class="text-xl font-semibold text-gray-800">Pending</h3>
                     <p class="text-2xl font-bold text-yellow-600"><?php echo $pending_count; ?></p>
                 </div>
-                <div class="bg-white rounded-xl shadow-md p-6 text-center">
+                <div class="bg-white rounded-xl shadow-md p-6 w-full max-w-xs mx-auto flex flex-col items-center justify-center aspect-square">
                     <i class="fas fa-thumbs-up text-3xl text-blue-600 mb-3"></i>
                     <h3 class="text-xl font-semibold text-gray-800">Accepted</h3>
                     <p class="text-2xl font-bold text-blue-600"><?php echo $accepted_count; ?></p>
                 </div>
-                <div class="bg-white rounded-xl shadow-md p-6 text-center">
+                <div class="bg-white rounded-xl shadow-md p-6 w-full max-w-xs mx-auto flex flex-col items-center justify-center aspect-square">
                     <i class="fas fa-check-circle text-3xl text-green-600 mb-3"></i>
                     <h3 class="text-xl font-semibold text-gray-800">Collected</h3>
                     <p class="text-2xl font-bold text-green-600"><?php echo $collected_count; ?></p>
                 </div>
-                <div class="bg-white rounded-xl shadow-md p-6 text-center">
-                    <i class="fas fa-times-circle text-3xl text-red-600 mb-3"></i>
+                <div class="bg-white rounded-xl shadow-md p-6 w-full max-w-xs mx-auto flex flex-col items-center justify-center aspect-square">
+                    <i class="fas fa-times-circle text-3xl text-brown-600 mb-3"></i>
                     <h3 class="text-xl font-semibold text-gray-800">Rejected</h3>
-                    <p class="text-2xl font-bold text-red-600"><?php echo $rejected_count; ?></p>
+                    <p class="text-2xl font-bold text-brown-600"><?php echo $rejected_count; ?></p>
                 </div>
             </div>
 
             <!-- Create New Request Form -->
-            <div class="bg-white rounded-xl shadow-md p-8 mb-8">
-                <h3 class="text-2xl font-bold text-gray-800 mb-6">
+            <div class="bg-white rounded-xl shadow-md p-8 mb-12 max-w-3xl mx-auto">
+                <h3 class="text-2xl font-bold text-green-600 mb-8 text-center">
                     <i class="fas fa-plus-circle text-green-600 mr-2"></i>Create New Request
                 </h3>
-                
                 <form method="POST" class="space-y-6">
                     <input type="hidden" name="action" value="create_request">
-                    
                     <!-- Waste Type -->
-                    <div>
-                        <label for="waste_type" class="block text-sm font-medium text-gray-700 mb-2">
+                    <div class="flex items-center mb-4">
+                        <label for="waste_type" class="w-1/3 text-base font-medium text-gray-700 mr-4 text-right">
                             <i class="fas fa-trash mr-2 text-green-600"></i>Waste Type *
                         </label>
                         <select id="waste_type" name="waste_type" required 
-                                class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all">
+                                class="w-2/3 px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all">
                             <option value="">Select waste type</option>
                             <option value="food">Food Waste</option>
                             <option value="glass">Glass</option>
@@ -444,49 +442,46 @@ $conn->close();
                     </div>
 
                     <!-- Pickup Address -->
-                    <div>
-                        <label for="pickup_address" class="block text-sm font-medium text-gray-700 mb-2">
+                    <div class="flex items-center mb-4">
+                        <label for="pickup_address" class="w-1/3 text-base font-medium text-gray-700 mr-4 text-right">
                             <i class="fas fa-map-marker-alt mr-2 text-green-600"></i>Pickup Address *
                         </label>
                         <textarea id="pickup_address" name="pickup_address" rows="3" required 
                                   placeholder="Enter complete pickup address including street, city, and postal code"
-                                  class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all resize-none"></textarea>
+                                  class="w-2/3 px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all resize-none"></textarea>
                     </div>
 
                     <!-- Date and Time -->
-                    <div class="grid md:grid-cols-2 gap-4">
-                        <div>
-                            <label for="pickup_date" class="block text-sm font-medium text-gray-700 mb-2">
-                                <i class="fas fa-calendar mr-2 text-green-600"></i>Preferred Date *
-                            </label>
-                            <input type="date" id="pickup_date" name="pickup_date" required 
-                                   min="<?php echo date('Y-m-d', strtotime('+1 day')); ?>"
-                                   class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all">
-                        </div>
-                        
-                        <div>
-                            <label for="pickup_time" class="block text-sm font-medium text-gray-700 mb-2">
-                                <i class="fas fa-clock mr-2 text-green-600"></i>Preferred Time *
-                            </label>
-                            <select id="pickup_time" name="pickup_time" required 
-                                    class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all">
-                                <option value="">Select time slot</option>
-                                <option value="08:00-10:00">8:00 AM - 10:00 AM</option>
-                                <option value="10:00-12:00">10:00 AM - 12:00 PM</option>
-                                <option value="12:00-14:00">12:00 PM - 2:00 PM</option>
-                                <option value="14:00-16:00">2:00 PM - 4:00 PM</option>
-                                <option value="16:00-18:00">4:00 PM - 6:00 PM</option>
-                            </select>
-                        </div>
+                    <div class="flex items-center mb-4">
+                        <label for="pickup_date" class="w-1/3 text-base font-medium text-gray-700 mr-4 text-right">
+                            <i class="fas fa-calendar mr-2 text-green-600"></i>Preferred Date *
+                        </label>
+                        <input type="date" id="pickup_date" name="pickup_date" required 
+                               min="<?php echo date('Y-m-d', strtotime('+1 day')); ?>"
+                               class="w-2/3 px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all">
+                    </div>
+                    <div class="flex items-center mb-4">
+                        <label for="pickup_time" class="w-1/3 text-base font-medium text-gray-700 mr-4 text-right">
+                            <i class="fas fa-clock mr-2 text-green-600"></i>Preferred Time *
+                        </label>
+                        <select id="pickup_time" name="pickup_time" required 
+                                class="w-2/3 px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all">
+                            <option value="">Select time slot</option>
+                            <option value="08:00-10:00">8:00 AM - 10:00 AM</option>
+                            <option value="10:00-12:00">10:00 AM - 12:00 PM</option>
+                            <option value="12:00-14:00">12:00 PM - 2:00 PM</option>
+                            <option value="14:00-16:00">2:00 PM - 4:00 PM</option>
+                            <option value="16:00-18:00">4:00 PM - 6:00 PM</option>
+                        </select>
                     </div>
 
                     <!-- Quantity Estimate -->
-                    <div>
-                        <label for="quantity_estimate" class="block text-sm font-medium text-gray-700 mb-2">
+                    <div class="flex items-center mb-4">
+                        <label for="quantity_estimate" class="w-1/3 text-base font-medium text-gray-700 mr-4 text-right">
                             <i class="fas fa-weight mr-2 text-green-600"></i>Weight Category
                         </label>
                         <select id="quantity_estimate" name="quantity_estimate" 
-                                class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all">
+                                class="w-2/3 px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all">
                             <option value="">Select weight category</option>
                             <option value="below-1kg">Below 1kg</option>
                             <option value="1-3kg">1-3kg</option>
@@ -500,17 +495,17 @@ $conn->close();
                     </div>
 
                     <!-- Special Instructions -->
-                    <div>
-                        <label for="special_instructions" class="block text-sm font-medium text-gray-700 mb-2">
+                    <div class="flex items-center mb-4">
+                        <label for="special_instructions" class="w-1/3 text-base font-medium text-gray-700 mr-4 text-right">
                             <i class="fas fa-sticky-note mr-2 text-green-600"></i>Special Instructions
                         </label>
                         <textarea id="special_instructions" name="special_instructions" rows="3" 
                                   placeholder="Any special instructions, access information, or additional details"
-                                  class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all resize-none"></textarea>
+                                  class="w-2/3 px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all resize-none"></textarea>
                     </div>
 
                     <!-- Form Actions -->
-                    <div class="flex flex-col sm:flex-row gap-4 pt-4">
+                    <div class="flex flex-col sm:flex-row gap-4 pt-4 justify-center">
                         <button type="submit" class="flex-1 bg-green-600 text-white py-3 px-6 rounded-lg hover:bg-green-700 transition-colors font-medium">
                             <i class="fas fa-paper-plane mr-2"></i>Submit Request
                         </button>
@@ -522,9 +517,9 @@ $conn->close();
             </div>
 
             <!-- Recent Requests -->
-            <div class="bg-white rounded-xl shadow-md p-6">
-                <h3 class="text-xl font-semibold text-gray-800 mb-6">
-                    <i class="fas fa-list text-gray-600 mr-2"></i>Recent Requests
+            <div class="bg-white rounded-xl shadow-md p-8 mb-8">
+                <h3 class="text-2xl font-bold text-green-600 mb-8">
+                    <i class="fas fa-list text-green-600 mr-2"></i>Recent Requests
                 </h3>
                 
                 <?php if (empty($recent_requests)): ?>
@@ -592,13 +587,13 @@ $conn->close();
                                             
                                             <!-- Delete Button (for pending) -->
                                             <button onclick="confirmDelete(<?php echo $request['request_id']; ?>)" 
-                                                    class="bg-red-600 text-white px-3 py-1.5 rounded-md hover:bg-red-700 transition-colors text-xs font-medium">
+                                                    class="bg-brown-600 text-white px-3 py-1.5 rounded-md hover:bg-brown-700 transition-colors text-xs font-medium">
                                                 <i class="fas fa-trash mr-1"></i>Delete
                                             </button>
                                         <?php elseif ($request['status'] === 'rejected'): ?>
                                             <!-- Delete Button (for rejected) -->
                                             <button onclick="confirmDelete(<?php echo $request['request_id']; ?>)" 
-                                                    class="bg-red-600 text-white px-3 py-1.5 rounded-md hover:bg-red-700 transition-colors text-xs font-medium">
+                                                    class="bg-brown-600 text-white px-3 py-1.5 rounded-md hover:bg-brown-700 transition-colors text-xs font-medium">
                                                 <i class="fas fa-trash mr-1"></i>Delete
                                             </button>
                                         <?php endif; ?>

@@ -258,15 +258,15 @@ $adminName = $_SESSION['user_name'] ?? 'Admin';
             
             <!-- Navigation Menu -->
             <div class="hidden md:flex space-x-6">
-                <a href="admin-dashboard.php" class="nav-link text-lg text-green-600 font-semibold">Dashboard</a>
-                <a href="admin-management.php" class="nav-link text-lg text-gray-700 hover:text-green-600 transition-colors">User Management</a>
-                <a href="company-settings.php" class="nav-link text-lg text-gray-700 hover:text-green-600 transition-colors">Company Settings</a>
+                <a href="admin-dashboard.php" class="nav-link text-base text-green-600 font-semibold">Dashboard</a>
+                <a href="admin-management.php" class="nav-link text-base text-gray-700 hover:text-green-600 transition-colors">User Management</a>
+                <a href="company-settings.php" class="nav-link text-base text-gray-700 hover:text-green-600 transition-colors">Company Settings</a>
             </div>
             
             <!-- Admin Info and Logout -->
             <div class="flex items-center space-x-4">
                 <span class="text-lg text-gray-700">Welcome, <?php echo htmlspecialchars($adminName); ?></span>
-                <a href="../../backend/logout.php" class="text-lg text-red-600 hover:text-red-700 transition-colors">
+                <a href="../../backend/logout.php" class="text-lg text-amber-900 hover:text-amber-800 transition-colors">
                     <i class="fas fa-sign-out-alt mr-2"></i>Logout
                 </a>
             </div>
@@ -274,8 +274,8 @@ $adminName = $_SESSION['user_name'] ?? 'Admin';
     </header>
 
     <!-- Main Content -->
-    <main class="pt-24 pb-12 min-h-screen">
-        <div class="container mx-auto px-6">
+    <main class="pt-36 pb-12 min-h-screen">
+        <div class="container mx-auto px-8 lg:px-32">
             
             <!-- Success/Error Messages -->
             <?php if ($success_message): ?>
@@ -309,44 +309,52 @@ $adminName = $_SESSION['user_name'] ?? 'Admin';
             <?php endif; ?>
 
             <!-- Page Header -->
-            <div class="bg-white rounded-2xl shadow-md p-6 mb-8">
+            <div class="bg-white rounded-2xl shadow-md p-6 mb-20">
                 <div class="flex items-center justify-between">
                     <div>
-                        <h1 class="text-4xl font-bold text-gray-800 mb-2">Admin Dashboard</h1>
-                        <p class="text-lg text-gray-600">Manage waste collection requests and system overview</p>
+                        <h1 class="text-5xl font-extrabold text-black mb-4">Admin Dashboard</h1>
+                        <p class="text-xl text-gray-600">Manage waste collection requests and system overview</p>
                     </div>
                     <div class="hidden md:block">
-                        <i class="fas fa-tachometer-alt text-6xl text-green-600"></i>
+                        <i class="fas fa-tachometer-alt text-7xl text-green-600"></i>
                     </div>
                 </div>
             </div>
 
             <!-- Statistics Cards -->
-            <div class="grid md:grid-cols-4 gap-6 mb-8">
-                <div class="bg-white rounded-xl shadow-md p-6 text-center">
-                    <i class="fas fa-list text-3xl text-blue-600 mb-3"></i>
-                    <h3 class="text-xl font-semibold text-gray-800">Total Requests</h3>
-                    <p class="text-3xl font-bold text-blue-600"><?php echo $stats['total_requests']; ?></p>
+            <div class="grid md:grid-cols-4 gap-8 mb-20">
+                <div class="bg-green-50 rounded-xl p-6 hover:shadow-lg transition-all transform hover:-translate-y-2 h-72 aspect-square flex flex-col justify-between">
+                    <div class="w-16 h-16 bg-blue-600 rounded-xl flex items-center justify-center mb-4 mx-auto">
+                        <i class="fas fa-list text-white text-2xl"></i>
+                    </div>
+                    <h3 class="text-xl font-semibold text-gray-800 text-center mb-3">Total Requests</h3>
+                    <p class="text-3xl font-bold text-blue-600 text-center"><?php echo $stats['total_requests']; ?></p>
                 </div>
-                <div class="bg-white rounded-xl shadow-md p-6 text-center">
-                    <i class="fas fa-clock text-3xl text-yellow-600 mb-3"></i>
-                    <h3 class="text-xl font-semibold text-gray-800">Pending</h3>
-                    <p class="text-3xl font-bold text-yellow-600"><?php echo $stats['pending_requests']; ?></p>
+                <div class="bg-yellow-50 rounded-xl p-6 hover:shadow-lg transition-all transform hover:-translate-y-2 h-72 aspect-square flex flex-col justify-between">
+                    <div class="w-16 h-16 bg-yellow-600 rounded-xl flex items-center justify-center mb-4 mx-auto">
+                        <i class="fas fa-clock text-white text-2xl"></i>
+                    </div>
+                    <h3 class="text-xl font-semibold text-gray-800 text-center mb-3">Pending</h3>
+                    <p class="text-3xl font-bold text-yellow-600 text-center"><?php echo $stats['pending_requests']; ?></p>
                 </div>
-                <div class="bg-white rounded-xl shadow-md p-6 text-center">
-                    <i class="fas fa-check-circle text-3xl text-green-600 mb-3"></i>
-                    <h3 class="text-xl font-semibold text-gray-800">Collected</h3>
-                    <p class="text-3xl font-bold text-green-600"><?php echo $stats['collected_requests']; ?></p>
+                <div class="bg-green-50 rounded-xl p-6 hover:shadow-lg transition-all transform hover:-translate-y-2 h-72 aspect-square flex flex-col justify-between">
+                    <div class="w-16 h-16 bg-green-600 rounded-xl flex items-center justify-center mb-4 mx-auto">
+                        <i class="fas fa-check-circle text-white text-2xl"></i>
+                    </div>
+                    <h3 class="text-xl font-semibold text-gray-800 text-center mb-3">Collected</h3>
+                    <p class="text-3xl font-bold text-green-600 text-center"><?php echo $stats['collected_requests']; ?></p>
                 </div>
-                <div class="bg-white rounded-xl shadow-md p-6 text-center">
-                    <i class="fas fa-times-circle text-3xl text-red-600 mb-3"></i>
-                    <h3 class="text-xl font-semibold text-gray-800">Rejected</h3>
-                    <p class="text-3xl font-bold text-red-600"><?php echo $stats['rejected_requests']; ?></p>
+                <div class="bg-amber-50 rounded-xl p-6 hover:shadow-lg transition-all transform hover:-translate-y-2 h-72 aspect-square flex flex-col justify-between">
+                    <div class="w-16 h-16 bg-amber-900 rounded-xl flex items-center justify-center mb-4 mx-auto">
+                        <i class="fas fa-times-circle text-white text-2xl"></i>
+                    </div>
+                    <h3 class="text-xl font-semibold text-gray-800 text-center mb-3">Rejected</h3>
+                    <p class="text-3xl font-bold text-amber-900 text-center"><?php echo $stats['rejected_requests']; ?></p>
                 </div>
             </div>
 
             <!-- Filter Section -->
-            <div class="bg-white rounded-xl shadow-md p-6 mb-8">
+            <div class="bg-white rounded-xl shadow-md p-6 mb-20">
                 <h3 class="text-lg font-semibold text-gray-800 mb-4">
                     <i class="fas fa-filter text-green-600 mr-2"></i>Filter Requests
                 </h3>
