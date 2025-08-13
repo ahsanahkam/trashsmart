@@ -245,7 +245,7 @@ $adminName = $_SESSION['user_name'] ?? 'Admin';
     <!-- Font Awesome for icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
-<body class="font-poppins bg-gray-50">
+<body class="font-poppins bg-gray-50 text-base md:text-lg">
     
     <!-- Header Section -->
     <header class="fixed top-0 left-0 right-0 bg-white shadow-md z-50">
@@ -312,8 +312,10 @@ $adminName = $_SESSION['user_name'] ?? 'Admin';
             <div class="bg-white rounded-2xl shadow-md p-6 mb-20">
                 <div class="flex items-center justify-between">
                     <div>
+
                         <h1 class="text-5xl font-extrabold text-black mb-4">Admin Dashboard</h1>
                         <p class="text-xl text-gray-600">Manage waste collection requests and system overview</p>
+
                     </div>
                     <div class="hidden md:block">
                         <i class="fas fa-tachometer-alt text-7xl text-green-600"></i>
@@ -322,6 +324,7 @@ $adminName = $_SESSION['user_name'] ?? 'Admin';
             </div>
 
             <!-- Statistics Cards -->
+
             <div class="grid md:grid-cols-4 gap-8 mb-20">
                 <div class="bg-green-50 rounded-xl p-6 hover:shadow-lg transition-all transform hover:-translate-y-2 h-72 aspect-square flex flex-col justify-between">
                     <div class="w-16 h-16 bg-blue-600 rounded-xl flex items-center justify-center mb-4 mx-auto">
@@ -350,12 +353,15 @@ $adminName = $_SESSION['user_name'] ?? 'Admin';
                     </div>
                     <h3 class="text-xl font-semibold text-gray-800 text-center mb-3">Rejected</h3>
                     <p class="text-3xl font-bold text-amber-900 text-center"><?php echo $stats['rejected_requests']; ?></p>
+
                 </div>
             </div>
 
             <!-- Filter Section -->
+
             <div class="bg-white rounded-xl shadow-md p-6 mb-20">
                 <h3 class="text-lg font-semibold text-gray-800 mb-4">
+
                     <i class="fas fa-filter text-green-600 mr-2"></i>Filter Requests
                 </h3>
                 
@@ -401,23 +407,23 @@ $adminName = $_SESSION['user_name'] ?? 'Admin';
             </div>
 
             <!-- Pending Requests Table -->
-            <div class="bg-white rounded-xl shadow-md overflow-hidden mb-8">
-                <div class="p-6 border-b border-gray-200">
-                    <h3 class="text-lg font-semibold text-gray-800">
+            <div class="bg-white rounded-xl shadow-md overflow-hidden mb-12">
+                <div class="p-8 border-b border-gray-200">
+                    <h3 class="text-2xl font-bold text-gray-800">
                         <i class="fas fa-clock text-yellow-600 mr-2"></i>
                         Pending Requests
-                        <span class="text-sm text-gray-500 ml-2">(<?php echo count($pending_requests); ?> records)</span>
+                        <span class="text-lg text-gray-500 ml-2">(<?php echo count($pending_requests); ?> records)</span>
                         <?php if ($total_pending_count > count($pending_requests)): ?>
-                            <span class="text-sm text-blue-500 ml-2">- Showing <?php echo count($pending_requests); ?> of <?php echo $total_pending_count; ?></span>
+                            <span class="text-lg text-blue-500 ml-2">- Showing <?php echo count($pending_requests); ?> of <?php echo $total_pending_count; ?></span>
                         <?php endif; ?>
                     </h3>
                 </div>
                 
                 <?php if (empty($pending_requests)): ?>
-                    <div class="text-center py-12">
-                        <i class="fas fa-clipboard-list text-4xl text-gray-400 mb-4"></i>
-                        <h4 class="text-lg font-medium text-gray-600 mb-2">No pending requests found</h4>
-                        <p class="text-gray-500">No pending requests match your filter criteria.</p>
+                    <div class="text-center py-16">
+                        <i class="fas fa-clipboard-list text-5xl text-gray-400 mb-6"></i>
+                        <h4 class="text-2xl font-bold text-gray-600 mb-4">No pending requests found</h4>
+                        <p class="text-lg text-gray-500">No pending requests match your filter criteria.</p>
                     </div>
                 <?php else: ?>
                     <div class="overflow-x-auto">
@@ -572,19 +578,19 @@ $adminName = $_SESSION['user_name'] ?? 'Admin';
 
             <!-- Rejected Requests Table -->
             <div class="bg-white rounded-xl shadow-md overflow-hidden">
-                <div class="p-6 border-b border-gray-200">
-                    <h3 class="text-lg font-semibold text-gray-800">
+                <div class="p-8 border-b border-gray-200">
+                    <h3 class="text-2xl font-bold text-gray-800">
                         <i class="fas fa-times-circle text-red-600 mr-2"></i>
                         Rejected Requests
-                        <span class="text-sm text-gray-500 ml-2">(<?php echo count($rejected_requests); ?> records)</span>
+                        <span class="text-lg text-gray-500 ml-2">(<?php echo count($rejected_requests); ?> records)</span>
                     </h3>
                 </div>
                 
                 <?php if (empty($rejected_requests)): ?>
-                    <div class="text-center py-12">
-                        <i class="fas fa-clipboard-list text-4xl text-gray-400 mb-4"></i>
-                        <h4 class="text-lg font-medium text-gray-600 mb-2">No rejected requests found</h4>
-                        <p class="text-gray-500">No requests have been rejected yet.</p>
+                    <div class="text-center py-16">
+                        <i class="fas fa-clipboard-list text-5xl text-gray-400 mb-6"></i>
+                        <h4 class="text-2xl font-bold text-gray-600 mb-4">No rejected requests found</h4>
+                        <p class="text-lg text-gray-500">No requests have been rejected yet.</p>
                     </div>
                 <?php else: ?>
                     <div class="overflow-x-auto">

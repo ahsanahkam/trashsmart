@@ -30,6 +30,214 @@ if (isset($_SESSION['success_message'])) {
     unset($_SESSION['success_message']); // Clear it so it doesn't show again
 }
 
+// Check for session error message (from redirect after profile actions)
+if (isset($_SESSION['error_message'])) {
+    $error_message = $_SESSION['error_message'];
+    unset($_SESSION['error_message']);
+}
+
+// Help: default profile image shown until user uploads one
+$defaultProfileImageRel = 'images/profile_picture.jpg'; // change or replace this file to change default
+$defaultProfileImageAbs = __DIR__ . '/images/profile_picture.jpg';
+
+// Optional guidance via query param: ?guide=profile_photo
+if (isset($_GET['guide']) && $_GET['guide'] === 'profile_photo') {
+    $success_message = 'Tip: Click "Update Profile" and choose a file under Profile Photo, then Save. Until you upload, the default image at ' . $defaultProfileImageRel . ' is shown.';
+}
+
+// Handle profile actions: update, delete, and remove photo
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['action'] === 'update_profile') {
+    // Collect inputs
+    $first_name = trim($_POST['first_name'] ?? '');
+    $last_name = trim($_POST['last_name'] ?? '');
+    $email = trim($_POST['email'] ?? '');
+    $phone = trim($_POST['phone'] ?? '');
+    $district = trim($_POST['district'] ?? '');
+    $nearest_town = trim($_POST['nearest_town'] ?? '');
+    $address = trim($_POST['address'] ?? '');
+    $date_of_birth = trim($_POST['date_of_birth'] ?? '');
+
+    // Basic validation
+    if ($first_name === '' || $last_name === '' || $email === '') {
+        $_SESSION['success_message'] = '';
+        $_SESSION['error_message'] = 'First name, last name, and email are required.';
+        header('Location: ' . $_SERVER['PHP_SELF']);
+        exit;
+    }
+    if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+        $_SESSION['success_message'] = '';
+        $_SESSION['error_message'] = 'Please enter a valid email address.';
+        header('Location: ' . $_SERVER['PHP_SELF']);
+        exit;
+    }
+
+    $conn = getDatabaseConnection();
+
+    // Ensure email is unique to this user
+    $stmt = $conn->prepare("SELECT user_id FROM users WHERE email = ? AND user_id <> ? LIMIT 1");
+    $stmt->bind_param('si', $email, $_SESSION['user_id']);
+    $stmt->execute();
+    $res = $stmt->get_result();
+    if ($res && $res->num_rows > 0) {
+        $stmt->close();
+        $conn->close();
+        $_SESSION['success_message'] = '';
+        $_SESSION['error_message'] = 'This email is already in use by another account.';
+        header('Location: ' . $_SERVER['PHP_SELF']);
+        exit;
+    }
+    $stmt->close();
+
+    // Update profile details
+    $update_sql = "UPDATE users 
+                   SET first_name = ?, last_name = ?, email = ?, phone = ?, district = ?, nearest_town = ?, address = ?, date_of_birth = ?
+                   WHERE user_id = ?";
+    $stmt = $conn->prepare($update_sql);
+    $stmt->bind_param('ssssssssi', $first_name, $last_name, $email, $phone, $district, $nearest_town, $address, $date_of_birth, $_SESSION['user_id']);
+    $ok = $stmt->execute();
+    $stmt->close();
+
+    if (!$ok) {
+        $conn->close();
+        $_SESSION['success_message'] = '';
+        $_SESSION['error_message'] = 'Failed to update profile. Please try again.';
+        header('Location: ' . $_SERVER['PHP_SELF']);
+        exit;
+    }
+
+    // Handle profile photo upload (optional)
+    if (isset($_FILES['profile_photo']) && is_array($_FILES['profile_photo']) && $_FILES['profile_photo']['error'] !== UPLOAD_ERR_NO_FILE) {
+        $fileError = $_FILES['profile_photo']['error'];
+        if ($fileError === UPLOAD_ERR_OK) {
+            $tmpPath = $_FILES['profile_photo']['tmp_name'];
+            $fileName = $_FILES['profile_photo']['name'];
+            $fileSize = $_FILES['profile_photo']['size'];
+
+            // Validate size (2MB max)
+            if ($fileSize > 2 * 1024 * 1024) {
+                // Too large
+                $conn->close();
+                $_SESSION['success_message'] = '';
+                $_SESSION['error_message'] = 'Profile photo must be 2MB or smaller.';
+                header('Location: ' . $_SERVER['PHP_SELF']);
+                exit;
+            }
+
+            // Validate image type
+            $allowedExts = ['jpg', 'jpeg', 'png', 'webp'];
+            $ext = strtolower(pathinfo($fileName, PATHINFO_EXTENSION));
+            if (!in_array($ext, $allowedExts, true)) {
+                $conn->close();
+                $_SESSION['success_message'] = '';
+                $_SESSION['error_message'] = 'Invalid image format. Allowed: JPG, JPEG, PNG, WEBP.';
+                header('Location: ' . $_SERVER['PHP_SELF']);
+                exit;
+            }
+            // Extra validation: ensure it's an image
+            $imgInfo = @getimagesize($tmpPath);
+            if ($imgInfo === false) {
+                $conn->close();
+                $_SESSION['success_message'] = '';
+                $_SESSION['error_message'] = 'Uploaded file is not a valid image.';
+                header('Location: ' . $_SERVER['PHP_SELF']);
+                exit;
+            }
+
+            $uploadDirRel = 'uploads/profile_photos';
+            $uploadDirAbs = __DIR__ . '/uploads/profile_photos';
+            if (!is_dir($uploadDirAbs)) {
+                @mkdir($uploadDirAbs, 0777, true);
+            }
+            // Remove any existing user photo
+            foreach (glob($uploadDirAbs . '/user_' . $_SESSION['user_id'] . '.*') as $oldFile) {
+                @unlink($oldFile);
+            }
+            $targetAbs = $uploadDirAbs . '/user_' . $_SESSION['user_id'] . '.' . $ext;
+            if (!@move_uploaded_file($tmpPath, $targetAbs)) {
+                $conn->close();
+                $_SESSION['success_message'] = '';
+                $_SESSION['error_message'] = 'Failed to save profile photo. Please try again.';
+                header('Location: ' . $_SERVER['PHP_SELF']);
+                exit;
+            }
+        } else {
+            // Handle common upload errors
+            $errorMap = [
+                UPLOAD_ERR_INI_SIZE => 'Uploaded image exceeds server size limit.',
+                UPLOAD_ERR_FORM_SIZE => 'Uploaded image exceeds form size limit.',
+                UPLOAD_ERR_PARTIAL => 'Image was only partially uploaded.',
+                UPLOAD_ERR_NO_TMP_DIR => 'Missing a temporary folder for uploads.',
+                UPLOAD_ERR_CANT_WRITE => 'Failed to write image to disk.',
+                UPLOAD_ERR_EXTENSION => 'A PHP extension stopped the file upload.'
+            ];
+            $msg = $errorMap[$fileError] ?? 'Unexpected upload error.';
+            $conn->close();
+            $_SESSION['success_message'] = '';
+            $_SESSION['error_message'] = $msg;
+            header('Location: ' . $_SERVER['PHP_SELF']);
+            exit;
+        }
+    }
+
+    // Update session display info
+    $_SESSION['user_name'] = trim($first_name . ' ' . $last_name);
+    $_SESSION['user_email'] = $email;
+
+    $conn->close();
+    $_SESSION['error_message'] = '';
+    $_SESSION['success_message'] = 'Profile updated successfully!';
+    header('Location: ' . $_SERVER['PHP_SELF']);
+    exit;
+}
+
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['action'] === 'remove_profile_photo') {
+    // Delete any existing profile photo files for the user
+    $uploadDirAbs = __DIR__ . '/uploads/profile_photos';
+    $removed = false;
+    if (is_dir($uploadDirAbs)) {
+        foreach (glob($uploadDirAbs . '/user_' . $_SESSION['user_id'] . '.*') as $oldFile) {
+            if (@unlink($oldFile)) { $removed = true; }
+        }
+    }
+    $_SESSION['success_message'] = $removed ? 'Profile photo removed.' : 'No profile photo to remove.';
+    $_SESSION['error_message'] = '';
+    header('Location: ' . $_SERVER['PHP_SELF']);
+    exit;
+}
+
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['action'] === 'delete_profile') {
+    $userId = (int)$_SESSION['user_id'];
+    $conn = getDatabaseConnection();
+
+    // Delete dependent records first to avoid FK issues
+    $stmt = $conn->prepare('DELETE FROM pending_requests WHERE user_id = ?');
+    $stmt->bind_param('i', $userId);
+    $stmt->execute();
+    $stmt->close();
+
+    // Delete the user account
+    $stmt = $conn->prepare('DELETE FROM users WHERE user_id = ?');
+    $stmt->bind_param('i', $userId);
+    $stmt->execute();
+    $stmt->close();
+
+    $conn->close();
+
+    // Remove profile photo files
+    $uploadDirAbs = __DIR__ . '/uploads/profile_photos';
+    if (is_dir($uploadDirAbs)) {
+        foreach (glob($uploadDirAbs . '/user_' . $userId . '.*') as $oldFile) {
+            @unlink($oldFile);
+        }
+    }
+
+    // Destroy session and redirect
+    session_unset();
+    session_destroy();
+    header('Location: index.php?account_deleted=1');
+    exit;
+}
+
 // Handle request form submission
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['action'] === 'create_request') {
     $waste_type = trim($_POST['waste_type']);
@@ -170,7 +378,7 @@ $userEmail = $_SESSION['user_email'] ?? '';
 $conn = getDatabaseConnection();
 
 $user_profile = null;
-$profile_query = "SELECT first_name, last_name, email, phone, district FROM users WHERE user_id = ?";
+$profile_query = "SELECT first_name, last_name, email, phone, district, nearest_town, address, date_of_birth FROM users WHERE user_id = ?";
 $stmt = $conn->prepare($profile_query);
 if ($stmt) {
     $stmt->bind_param("i", $_SESSION['user_id']);
@@ -182,6 +390,19 @@ if ($stmt) {
     // Failed to prepare profile query
 }
 $conn->close();
+
+// Resolve profile photo URL (filesystem based, no DB needed)
+$uploadDirRel = 'uploads/profile_photos';
+$uploadDirAbs = __DIR__ . '/uploads/profile_photos';
+$profilePhotoUrl = 'images/profile_picture.jpg';
+$allowedExtsView = ['jpg','jpeg','png','webp'];
+foreach ($allowedExtsView as $e) {
+    $candidate = $uploadDirAbs . '/user_' . $_SESSION['user_id'] . '.' . $e;
+    if (file_exists($candidate)) {
+        $profilePhotoUrl = $uploadDirRel . '/user_' . $_SESSION['user_id'] . '.' . $e . '?v=' . filemtime($candidate);
+        break;
+    }
+}
 
 // Get request statistics and recent requests
 $conn = getDatabaseConnection();
@@ -254,7 +475,7 @@ $conn->close();
     <!-- Font Awesome for icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
-<body class="font-poppins bg-white">
+<body class="font-poppins bg-white text-base md:text-lg">
     
     <!-- Header Section -->
     <header class="fixed top-0 left-0 right-0 bg-white shadow-md z-50">
@@ -326,8 +547,8 @@ $conn->close();
             <div class="bg-white rounded-2xl shadow-md p-8 mb-12">
                 <div class="flex items-center justify-between">
                     <div class="flex-1">
-                        <h1 class="text-3xl font-bold text-gray-800 mb-2">Welcome to Your Dashboard</h1>
-                        <p class="text-gray-600 mb-6">Hello <?php 
+                        <h2 class="text-2xl md:text-4xl font-bold text-gray-800 mb-4">Welcome to Your Dashboard</h2>
+                        <p class="text-base md:text-lg text-gray-700 mb-6">Hello <?php 
                             if ($user_profile && !empty($user_profile['first_name'])) {
                                 echo htmlspecialchars($user_profile['first_name'] . ' ' . $user_profile['last_name']);
                             } else {
@@ -337,13 +558,41 @@ $conn->close();
                         
                         <!-- User Profile Information -->
                         <div class="bg-gray-50 rounded-xl p-6">
-                            <h3 class="text-lg font-semibold text-gray-800 mb-4">
+                            <h3 class="text-2xl font-bold text-gray-800 mb-6">
                                 <i class="fas fa-user text-green-600 mr-2"></i>Profile Information
                             </h3>
                             
-                            <div class="grid md:grid-cols-2 gap-4">
+                            <!-- Photo + Actions -->
+                            <div class="flex items-center justify-between mb-6 gap-4 flex-col sm:flex-row">
+                                <div class="flex items-center gap-4">
+                                    <img src="<?php echo htmlspecialchars($profilePhotoUrl); ?>" alt="Profile Photo" class="w-20 h-20 rounded-full object-cover border border-gray-200">
+                                    <div>
+                                        <p class="text-sm text-gray-500">Profile Photo</p>
+                                        <p class="text-xs text-gray-400">JPG/PNG/WEBP up to 2MB</p>
+                                    </div>
+                                </div>
+                                <div class="flex flex-wrap gap-2">
+                                    <button type="button" onclick="openProfileModal()" class="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition-colors text-sm font-medium">
+                                        <i class="fas fa-user-edit mr-2"></i>Update Profile
+                                    </button>
+                                    <form method="POST" onsubmit="return confirmRemovePhoto();">
+                                        <input type="hidden" name="action" value="remove_profile_photo">
+                                        <button type="submit" class="bg-gray-600 text-white px-4 py-2 rounded-lg hover:bg-gray-700 transition-colors text-sm font-medium">
+                                            <i class="fas fa-image mr-2"></i>Remove Photo
+                                        </button>
+                                    </form>
+                                    <form method="POST" onsubmit="return confirmDeleteProfile();">
+                                        <input type="hidden" name="action" value="delete_profile">
+                                        <button type="submit" class="bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700 transition-colors text-sm font-medium">
+                                            <i class="fas fa-user-times mr-2"></i>Delete Account
+                                        </button>
+                                    </form>
+                                </div>
+                            </div>
+
+                            <div class="grid md:grid-cols-2 gap-6">
                                 <?php if ($user_profile): ?>
-                                    <div class="flex items-center">
+                                    <div class="flex items-center text-lg">
                                         <i class="fas fa-user-circle text-gray-500 mr-3"></i>
                                         <div>
                                             <p class="text-sm text-gray-500">Full Name</p>
@@ -353,7 +602,7 @@ $conn->close();
                                         </div>
                                     </div>
                                     
-                                    <div class="flex items-center">
+                                    <div class="flex items-center text-lg">
                                         <i class="fas fa-envelope text-gray-500 mr-3"></i>
                                         <div>
                                             <p class="text-sm text-gray-500">Email</p>
@@ -361,7 +610,7 @@ $conn->close();
                                         </div>
                                     </div>
                                     
-                                    <div class="flex items-center">
+                                    <div class="flex items-center text-lg">
                                         <i class="fas fa-phone text-gray-500 mr-3"></i>
                                         <div>
                                             <p class="text-sm text-gray-500">Contact</p>
@@ -369,15 +618,29 @@ $conn->close();
                                         </div>
                                     </div>
                                     
-                                    <div class="flex items-center">
+                                    <div class="flex items-center text-lg">
                                         <i class="fas fa-map-marker-alt text-gray-500 mr-3"></i>
                                         <div>
                                             <p class="text-sm text-gray-500">District</p>
                                             <p class="font-medium text-gray-800"><?php echo htmlspecialchars($user_profile['district']); ?></p>
                                         </div>
                                     </div>
+                                    <div class="flex items-center text-lg">
+                                        <i class="fas fa-city text-gray-500 mr-3"></i>
+                                        <div>
+                                            <p class="text-sm text-gray-500">Nearest Town</p>
+                                            <p class="font-medium text-gray-800"><?php echo htmlspecialchars($user_profile['nearest_town'] ?? ''); ?></p>
+                                        </div>
+                                    </div>
+                                    <div class="flex items-center text-lg">
+                                        <i class="fas fa-home text-gray-500 mr-3"></i>
+                                        <div>
+                                            <p class="text-sm text-gray-500">Address</p>
+                                            <p class="font-medium text-gray-800"><?php echo htmlspecialchars($user_profile['address'] ?? ''); ?></p>
+                                        </div>
+                                    </div>
                                 <?php else: ?>
-                                    <div class="md:col-span-2 text-center text-gray-500">
+                                    <div class="md:col-span-2 text-center text-gray-500 text-lg">
                                         <i class="fas fa-exclamation-triangle mr-2"></i>
                                         Profile information not available
                                     </div>
@@ -385,14 +648,12 @@ $conn->close();
                             </div>
                         </div>
                     </div>
-                    <div class="hidden lg:block ml-8">
-                        <i class="fas fa-user-circle text-8xl text-green-600"></i>
-                    </div>
                 </div>
             </div>
 
             <!-- Quick Stats -->
             <div class="grid md:grid-cols-4 gap-8 mb-12">
+
                 <div class="bg-white rounded-xl shadow-md p-6 w-full max-w-xs mx-auto flex flex-col items-center justify-center aspect-square">
                     <i class="fas fa-clock text-3xl text-yellow-600 mb-3"></i>
                     <h3 class="text-xl font-semibold text-gray-800">Pending</h3>
@@ -412,19 +673,24 @@ $conn->close();
                     <i class="fas fa-times-circle text-3xl text-brown-600 mb-3"></i>
                     <h3 class="text-xl font-semibold text-gray-800">Rejected</h3>
                     <p class="text-2xl font-bold text-brown-600"><?php echo $rejected_count; ?></p>
+
                 </div>
             </div>
 
             <!-- Create New Request Form -->
+
             <div class="bg-white rounded-xl shadow-md p-8 mb-12 max-w-3xl mx-auto">
                 <h3 class="text-2xl font-bold text-green-600 mb-8 text-center">
                     <i class="fas fa-plus-circle text-green-600 mr-2"></i>Create New Request
                 </h3>
                 <form method="POST" class="space-y-6">
+
                     <input type="hidden" name="action" value="create_request">
                     <!-- Waste Type -->
+
                     <div class="flex items-center mb-4">
                         <label for="waste_type" class="w-1/3 text-base font-medium text-gray-700 mr-4 text-right">
+
                             <i class="fas fa-trash mr-2 text-green-600"></i>Waste Type *
                         </label>
                         <select id="waste_type" name="waste_type" required 
@@ -442,8 +708,10 @@ $conn->close();
                     </div>
 
                     <!-- Pickup Address -->
+
                     <div class="flex items-center mb-4">
                         <label for="pickup_address" class="w-1/3 text-base font-medium text-gray-700 mr-4 text-right">
+
                             <i class="fas fa-map-marker-alt mr-2 text-green-600"></i>Pickup Address *
                         </label>
                         <textarea id="pickup_address" name="pickup_address" rows="3" required 
@@ -452,6 +720,7 @@ $conn->close();
                     </div>
 
                     <!-- Date and Time -->
+
                     <div class="flex items-center mb-4">
                         <label for="pickup_date" class="w-1/3 text-base font-medium text-gray-700 mr-4 text-right">
                             <i class="fas fa-calendar mr-2 text-green-600"></i>Preferred Date *
@@ -478,6 +747,7 @@ $conn->close();
                     <!-- Quantity Estimate -->
                     <div class="flex items-center mb-4">
                         <label for="quantity_estimate" class="w-1/3 text-base font-medium text-gray-700 mr-4 text-right">
+
                             <i class="fas fa-weight mr-2 text-green-600"></i>Weight Category
                         </label>
                         <select id="quantity_estimate" name="quantity_estimate" 
@@ -495,8 +765,10 @@ $conn->close();
                     </div>
 
                     <!-- Special Instructions -->
+
                     <div class="flex items-center mb-4">
                         <label for="special_instructions" class="w-1/3 text-base font-medium text-gray-700 mr-4 text-right">
+
                             <i class="fas fa-sticky-note mr-2 text-green-600"></i>Special Instructions
                         </label>
                         <textarea id="special_instructions" name="special_instructions" rows="3" 
@@ -505,11 +777,13 @@ $conn->close();
                     </div>
 
                     <!-- Form Actions -->
+
                     <div class="flex flex-col sm:flex-row gap-4 pt-4 justify-center">
                         <button type="submit" class="flex-1 bg-green-600 text-white py-3 px-6 rounded-lg hover:bg-green-700 transition-colors font-medium">
+
                             <i class="fas fa-paper-plane mr-2"></i>Submit Request
                         </button>
-                        <button type="reset" class="flex-1 bg-gray-600 text-white py-3 px-6 rounded-lg hover:bg-gray-700 transition-colors font-medium">
+                        <button type="reset" class="flex-1 bg-gray-600 text-white py-4 px-8 rounded-lg hover:bg-gray-700 transition-colors font-semibold text-lg">
                             <i class="fas fa-times mr-2"></i>Clear Form
                         </button>
                     </div>
@@ -517,23 +791,25 @@ $conn->close();
             </div>
 
             <!-- Recent Requests -->
+
             <div class="bg-white rounded-xl shadow-md p-8 mb-8">
                 <h3 class="text-2xl font-bold text-green-600 mb-8">
                     <i class="fas fa-list text-green-600 mr-2"></i>Recent Requests
+
                 </h3>
                 
                 <?php if (empty($recent_requests)): ?>
                     <!-- Empty State -->
-                    <div class="text-center py-12">
-                        <i class="fas fa-inbox text-4xl text-gray-400 mb-4"></i>
-                        <h4 class="text-lg font-medium text-gray-600 mb-2">No requests yet</h4>
-                        <p class="text-gray-500">Your submitted requests will appear here. Use the form above to create your first request.</p>
+                    <div class="text-center py-16">
+                        <i class="fas fa-inbox text-5xl text-gray-400 mb-6"></i>
+                        <h4 class="text-2xl font-bold text-gray-600 mb-4">No requests yet</h4>
+                        <p class="text-lg text-gray-500">Your submitted requests will appear here. Use the form above to create your first request.</p>
                     </div>
                 <?php else: ?>
                     <!-- Requests List -->
-                    <div class="space-y-4">
+                    <div class="space-y-8">
                         <?php foreach ($recent_requests as $request): ?>
-                            <div class="border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow"
+                            <div class="border border-gray-200 rounded-lg p-8 hover:shadow-lg transition-shadow text-lg"
                                  data-request-id="<?php echo $request['request_id']; ?>"
                                  data-waste-type="<?php echo htmlspecialchars($request['waste_type']); ?>"
                                  data-pickup-address="<?php echo htmlspecialchars($request['pickup_address']); ?>"
@@ -541,7 +817,7 @@ $conn->close();
                                  data-pickup-time="<?php echo htmlspecialchars($request['pickup_time']); ?>"
                                  data-quantity-estimate="<?php echo htmlspecialchars($request['weight_category'] ?? ''); ?>"
                                  data-special-instructions="<?php echo htmlspecialchars($request['special_instructions'] ?? ''); ?>">
-                                <div class="flex items-start justify-between mb-3">
+                                <div class="flex items-start justify-between mb-6">
                                     <div class="flex items-center">
                                         <span class="text-sm font-medium text-gray-500 mr-3">Request #<?php echo $request['request_id']; ?></span>
                                         <?php
@@ -600,7 +876,7 @@ $conn->close();
                                     </div>
                                 </div>
                                 
-                                <div class="grid md:grid-cols-2 gap-4">
+                                <div class="grid md:grid-cols-2 gap-6">
                                     <div>
                                         <p class="text-sm text-gray-600 mb-1">
                                             <i class="fas fa-trash text-green-600 mr-2"></i>
@@ -634,7 +910,7 @@ $conn->close();
     </main>
 
     <!-- Update Request Modal -->
-    <div id="updateModal" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden">
+    <div id="updateModal" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden text-lg">
         <div class="flex items-center justify-center min-h-screen p-4">
             <div class="bg-white rounded-2xl shadow-xl max-w-2xl w-full max-h-screen overflow-y-auto">
                 <div class="p-6">
@@ -753,6 +1029,95 @@ $conn->close();
         </div>
     </div>
 
+    <!-- Update Profile Modal -->
+    <div id="profileModal" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden text-lg">
+        <div class="flex items-center justify-center min-h-screen p-4">
+            <div class="bg-white rounded-2xl shadow-xl max-w-2xl w-full max-h-screen overflow-y-auto">
+                <div class="p-6">
+                    <!-- Modal Header -->
+                    <div class="flex items-center justify-between mb-6">
+                        <h2 class="text-2xl font-bold text-gray-800">
+                            <i class="fas fa-user-cog text-green-600 mr-2"></i>Update Profile
+                        </h2>
+                        <button onclick="closeProfileModal()" class="text-gray-400 hover:text-gray-600">
+                            <i class="fas fa-times text-xl"></i>
+                        </button>
+                    </div>
+
+                    <form id="profileForm" method="POST" enctype="multipart/form-data" class="space-y-4">
+                        <input type="hidden" name="action" value="update_profile">
+
+                        <div class="grid md:grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">First Name *</label>
+                                <input type="text" name="first_name" required value="<?php echo htmlspecialchars($user_profile['first_name'] ?? ''); ?>"
+                                       class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all" />
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Last Name *</label>
+                                <input type="text" name="last_name" required value="<?php echo htmlspecialchars($user_profile['last_name'] ?? ''); ?>"
+                                       class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all" />
+                            </div>
+                        </div>
+
+                        <div class="grid md:grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Email *</label>
+                                <input type="email" name="email" required value="<?php echo htmlspecialchars($user_profile['email'] ?? ''); ?>"
+                                       class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all" />
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Contact</label>
+                                <input type="text" name="phone" value="<?php echo htmlspecialchars($user_profile['phone'] ?? ''); ?>"
+                                       class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all" />
+                            </div>
+                        </div>
+
+                        <div class="grid md:grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">District</label>
+                                <input type="text" name="district" value="<?php echo htmlspecialchars($user_profile['district'] ?? ''); ?>"
+                                       class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all" />
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Nearest Town</label>
+                                <input type="text" name="nearest_town" value="<?php echo htmlspecialchars($user_profile['nearest_town'] ?? ''); ?>"
+                                       class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all" />
+                            </div>
+                        </div>
+
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Address</label>
+                            <textarea name="address" rows="3" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all resize-none"><?php echo htmlspecialchars($user_profile['address'] ?? ''); ?></textarea>
+                        </div>
+
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Date of Birth</label>
+                            <input type="date" name="date_of_birth" value="<?php echo htmlspecialchars($user_profile['date_of_birth'] ?? ''); ?>"
+                                   class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all" />
+                        </div>
+
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Profile Photo</label>
+                            <input type="file" name="profile_photo" accept="image/*"
+                                   class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all bg-white" />
+                            <p class="text-xs text-gray-500 mt-1">Optional. JPG/PNG/WEBP up to 2MB.</p>
+                        </div>
+
+                        <div class="flex flex-col sm:flex-row gap-4 pt-4">
+                            <button type="submit" class="flex-1 bg-green-600 text-white py-3 px-6 rounded-lg hover:bg-green-700 transition-colors font-medium">
+                                <i class="fas fa-save mr-2"></i>Save Changes
+                            </button>
+                            <button type="button" onclick="closeProfileModal()" class="flex-1 bg-gray-600 text-white py-3 px-6 rounded-lg hover:bg-gray-700 transition-colors font-medium">
+                                <i class="fas fa-times mr-2"></i>Cancel
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- Footer -->
     <footer class="bg-gradient-to-r from-green-50 to-green-100 py-6">
         <div class="container mx-auto px-12">
@@ -846,6 +1211,23 @@ $conn->close();
                 closeUpdateModal();
             }
         });
+
+        // Profile modal handlers
+        function openProfileModal() {
+            document.getElementById('profileModal').classList.remove('hidden');
+        }
+        function closeProfileModal() {
+            document.getElementById('profileModal').classList.add('hidden');
+            const form = document.getElementById('profileForm');
+            if (form) form.reset();
+        }
+        // Confirmations
+        function confirmDeleteProfile() {
+            return confirm('Are you sure you want to permanently delete your account? This action cannot be undone. All your requests will be removed.');
+        }
+        function confirmRemovePhoto() {
+            return confirm('Remove your profile photo?');
+        }
     </script>
 </body>
 </html>
