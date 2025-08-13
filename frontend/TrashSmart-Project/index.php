@@ -328,9 +328,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
         <div class="container mx-auto px-4 py-12">
             <div class="flex flex-col lg:flex-row gap-12 items-center bg-white rounded-2xl shadow-lg p-6 h-[40rem] w-full mx-auto">
                 <div class="flex-1 px-8 lg:px-32 text-left">
-                    <h1 class="text-4xl md:text-5xl font-extrabold text-black mb-6">Join TrashSmart</h1>
-                    <h2 class="text-4xl font-bold text-green-700 mb-8">Keep Your Environment Clean!</h2>
-                    <p class="text-2xl text-gray-700 mb-10 leading-relaxed">
+
+                    <h1 class="text-5xl font-extrabold text-black mb-4">Join TrashSmart</h1>
+                    <h2 class="text-3xl font-semibold text-green-700 mb-6">Keep Your Environment Clean!</h2>
+                    <p class="text-xl text-gray-600 mb-8 leading-relaxed">
+
                         Smart waste management for a sustainable future.
                         Connect with local waste collection services &
                         Learn proper recycling techniques.
@@ -382,42 +384,46 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
     <section id="features" class="py-20 bg-white">
         <div class="container mx-auto px-8 lg:px-32">
             <div class="text-center mb-12">
-                <h2 class="text-5xl font-extrabold text-gray-800 mb-6">Why Choose TrashSmart?</h2>
-                <p class="text-2xl text-gray-700 max-w-3xl mx-auto mb-2">
+
+                <h2 class="text-4xl font-extrabold text-gray-800 mb-4">Why Choose TrashSmart?</h2>
+                <p class="text-xl text-gray-600 max-w-3xl mx-auto">
+
                     Our platform brings together advanced technology and environmental consciousness to create the most efficient waste management solution.
                 </p>
             </div>
             
             <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
-                <div class="bg-green-50 rounded-xl p-6 hover:shadow-lg transition-all transform hover:-translate-y-2 h-72 aspect-square flex flex-col justify-between">
-                    <div class="w-16 h-16 bg-green-600 rounded-xl flex items-center justify-center mb-4 mx-auto">
+
+                <div class="bg-green-50 rounded-xl p-6 hover:shadow-lg transition-all transform hover:-translate-y-2 h-60 w-60 flex flex-col justify-between mx-auto">
+                    <div class="w-14 h-14 bg-green-600 rounded-xl flex items-center justify-center mb-4 mx-auto">
                         <i class="fas fa-clock text-white text-2xl"></i>
                     </div>
-                    <h3 class="text-2xl font-bold text-gray-800 text-center mb-4">24/7 Service</h3>
+                    <h3 class="text-xl font-semibold text-black text-center mb-3">24/7 Service</h3>
                     <p class="text-gray-600 text-center">Schedule pickups anytime, anywhere with our round-the-clock service availability.</p>
                 </div>
                 
-                <div class="bg-blue-50 rounded-xl p-6 hover:shadow-lg transition-all transform hover:-translate-y-2 h-72 aspect-square flex flex-col justify-between">
-                    <div class="w-16 h-16 bg-blue-600 rounded-xl flex items-center justify-center mb-4 mx-auto">
+                <div class="bg-blue-50 rounded-xl p-6 hover:shadow-lg transition-all transform hover:-translate-y-2 h-60 w-60 flex flex-col justify-between mx-auto">
+                    <div class="w-14 h-14 bg-blue-600 rounded-xl flex items-center justify-center mb-4 mx-auto">
                         <i class="fas fa-map-marker-alt text-white text-2xl"></i>
                     </div>
-                    <h3 class="text-2xl font-bold text-gray-800 text-center mb-4">Real-time Tracking</h3>
+                    <h3 class="text-xl font-semibold text-black text-center mb-3">Real-time Tracking</h3>
                     <p class="text-gray-600 text-center">Track your waste collection requests in real-time and stay updated on pickup status.</p>
                 </div>
                 
-                <div class="bg-yellow-50 rounded-xl p-6 hover:shadow-lg transition-all transform hover:-translate-y-2 h-72 aspect-square flex flex-col justify-between">
-                    <div class="w-16 h-16 bg-yellow-600 rounded-xl flex items-center justify-center mb-4 mx-auto">
+                <div class="bg-yellow-50 rounded-xl p-6 hover:shadow-lg transition-all transform hover:-translate-y-2 h-60 w-60 flex flex-col justify-between mx-auto">
+                    <div class="w-14 h-14 bg-yellow-600 rounded-xl flex items-center justify-center mb-4 mx-auto">
                         <i class="fas fa-leaf text-white text-2xl"></i>
                     </div>
-                    <h3 class="text-2xl font-bold text-gray-800 text-center mb-4">Eco-Friendly</h3>
+                    <h3 class="text-xl font-semibold text-black text-center mb-3">Eco-Friendly</h3>
                     <p class="text-gray-600 text-center">Contribute to environmental sustainability with our green waste management practices.</p>
                 </div>
                 
-                <div class="bg-purple-50 rounded-xl p-6 hover:shadow-lg transition-all transform hover:-translate-y-2 h-72 aspect-square flex flex-col justify-between">
-                    <div class="w-16 h-16 bg-purple-600 rounded-xl flex items-center justify-center mb-4 mx-auto">
+                <div class="bg-purple-50 rounded-xl p-6 hover:shadow-lg transition-all transform hover:-translate-y-2 h-60 w-60 flex flex-col justify-between mx-auto">
+                    <div class="w-14 h-14 bg-purple-600 rounded-xl flex items-center justify-center mb-4 mx-auto">
                         <i class="fas fa-users text-white text-2xl"></i>
                     </div>
-                    <h3 class="text-2xl font-bold text-gray-800 text-center mb-4">Community Driven</h3>
+                    <h3 class="text-xl font-semibold text-black text-center mb-3">Community Driven</h3>
+
                     <p class="text-gray-600 text-center">Join a community of environmentally conscious citizens working towards a cleaner future.</p>
                 </div>
             </div>
@@ -428,19 +434,22 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
     </div>
 
     <!-- Tips Section -->
-    <!-- Tips Section -->
+
     <section id="tips" class="py-20 bg-gray-50">
         <div class="container mx-auto px-8 lg:px-32">
             <div class="text-center mb-12">
-                <h2 class="text-5xl font-extrabold text-gray-800 mb-6">Learn to Sort &amp; Recycle</h2>
-                <p class="text-2xl text-gray-700 max-w-3xl mx-auto mb-2">
+                <h2 class="text-4xl font-extrabold text-gray-800 mb-4">Learn to Sort &amp; Recycle</h2>
+                <p class="text-xl text-gray-600 max-w-3xl mx-auto">
+
                     Discover the different types of waste and learn how to properly sort and recycle them for a cleaner environment.
                 </p>
             </div>
             <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
                 <div class="bg-green-50 rounded-xl p-6 hover:shadow-lg transition-all transform hover:-translate-y-2 h-72 aspect-square flex flex-col justify-between">
                     <!-- Icon removed -->
-                    <h3 class="text-2xl font-bold text-gray-800 text-center mb-4">Organic Waste</h3>
+
+                    <h3 class="text-xl font-semibold text-gray-800 text-center mb-3">Organic Waste</h3>
+
                     <p class="text-gray-600 text-center">Food scraps, garden waste, and biodegradable materials</p>
                     <div class="bg-green-100 rounded-lg p-3 mt-2 flex items-center">
                         <span class="text-2xl mr-2">💡</span>
@@ -449,7 +458,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
                 </div>
                 <div class="bg-blue-50 rounded-xl p-6 hover:shadow-lg transition-all transform hover:-translate-y-2 h-72 aspect-square flex flex-col justify-between">
                     <!-- Icon removed -->
-                    <h3 class="text-2xl font-bold text-gray-800 text-center mb-4">Plastic Waste</h3>
+
+                    <h3 class="text-xl font-semibold text-gray-800 text-center mb-3">Plastic Waste</h3>
+
                     <p class="text-gray-600 text-center">Bottles, containers, and plastic packaging</p>
                     <div class="bg-blue-100 rounded-lg p-3 mt-2 flex items-center">
                         <span class="text-2xl mr-2">💡</span>
@@ -458,7 +469,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
                 </div>
                 <div class="bg-yellow-50 rounded-xl p-6 hover:shadow-lg transition-all transform hover:-translate-y-2 h-72 aspect-square flex flex-col justify-between">
                     <!-- Icon removed -->
-                    <h3 class="text-2xl font-bold text-gray-800 text-center mb-4">Paper Waste</h3>
+
+                    <h3 class="text-xl font-semibold text-gray-800 text-center mb-3">Paper Waste</h3>
+
                     <p class="text-gray-600 text-center">Newspapers, cardboard, and paper products</p>
                     <div class="bg-yellow-100 rounded-lg p-3 mt-2 flex items-center">
                         <span class="text-2xl mr-2">💡</span>
@@ -467,7 +480,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
                 </div>
                 <div class="bg-purple-50 rounded-xl p-6 hover:shadow-lg transition-all transform hover:-translate-y-2 h-72 aspect-square flex flex-col justify-between">
                     <!-- Icon removed -->
-                    <h3 class="text-2xl font-bold text-gray-800 text-center mb-4">Electronic Waste</h3>
+
+                    <h3 class="text-xl font-semibold text-gray-800 text-center mb-3">Electronic Waste</h3>
+
                     <p class="text-gray-600 text-center">Old electronics, batteries, and electrical items</p>
                     <div class="bg-purple-100 rounded-lg p-3 mt-2 flex items-center">
                         <span class="text-2xl mr-2">💡</span>
@@ -482,37 +497,40 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
     </div>
 
     <!-- About Section -->
-    <!-- About Section -->
+
 <section id="about" class="py-20 bg-white">
     <div class="container mx-auto px-8 lg:px-32">
         <div class="text-center mb-12">
-            <h2 class="text-5xl font-extrabold text-gray-800 mb-6">About TrashSmart</h2>
+            <h2 class="text-4xl font-extrabold text-gray-800 mb-4">About TrashSmart</h2>
         </div>
         <div class="grid lg:grid-cols-2 gap-12 items-center">
             <div>
-                <p class="text-xl text-gray-700 mb-8 text-justify leading-relaxed">
+                <p class="text-lg text-gray-600 mb-6 text-justify leading-relaxed">
                     TrashSmart is dedicated to revolutionizing waste management for a cleaner, greener future. Our mission is to empower communities with smart solutions that make recycling and waste disposal easy, efficient, and environmentally friendly.
                 </p>
                 <div class="bg-green-50 border-l-4 border-green-500 p-4 mb-6">
-                    <h3 class="text-2xl font-bold text-gray-800 mb-4">Our Mission</h3>
+                    <h3 class="text-lg font-semibold text-gray-800 mb-2">Our Mission</h3>
+
                     <p class="text-gray-600 text-justify">To provide innovative waste management services that promote sustainability and community well-being.</p>
                 </div>
                 <div class="grid grid-cols-2 gap-6">
                     <div class="text-center">
-                        <div class="text-4xl font-extrabold text-green-600 mb-2">10K+</div>
-                        <div class="text-lg text-gray-700">Happy Citizens</div>
+
+                        <div class="text-3xl font-bold text-green-600 mb-2">10K+</div>
+                        <div class="text-gray-600">Happy Citizens</div>
                     </div>
                     <div class="text-center">
-                        <div class="text-4xl font-extrabold text-green-600 mb-2">25K+</div>
-                        <div class="text-lg text-gray-700">Pickups Completed</div>
+                        <div class="text-3xl font-bold text-green-600 mb-2">25K+</div>
+                        <div class="text-gray-600">Pickups Completed</div>
                     </div>
                     <div class="text-center">
-                        <div class="text-4xl font-extrabold text-green-600 mb-2">50+</div>
-                        <div class="text-lg text-gray-700">Partner Organizations</div>
+                        <div class="text-3xl font-bold text-green-600 mb-2">50+</div>
+                        <div class="text-gray-600">Partner Organizations</div>
                     </div>
                     <div class="text-center">
-                        <div class="text-4xl font-extrabold text-green-600 mb-2">95%</div>
-                        <div class="text-lg text-gray-700">Satisfaction Rate</div>
+                        <div class="text-3xl font-bold text-green-600 mb-2">95%</div>
+                        <div class="text-gray-600">Satisfaction Rate</div>
+
                     </div>
                 </div>
             </div>
@@ -527,12 +545,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
     </div>
 
     <!-- Contact Section -->
-    <!-- Contact Section -->
+
     <section id="contact" class="pt-8 pb-20 bg-gray-50">
         <div class="container mx-auto px-4 py-12">
             <div class="text-center mb-10">
-                <h2 class="text-5xl font-extrabold text-gray-800 mb-6">Contact TrashSmart</h2>
-                <p class="text-2xl text-gray-700 max-w-2xl mx-auto mb-2">Have questions or need assistance? Get in touch with our team.</p>
+                <h2 class="text-4xl font-extrabold text-gray-800 mb-4">Contact TrashSmart</h2>
+                <p class="text-xl text-gray-600 max-w-2xl mx-auto">Have questions or need assistance? Get in touch with our team.</p>
+
             </div>
             <div class="flex flex-col lg:flex-row gap-12 items-center bg-white rounded-2xl shadow-lg p-6 w-full mx-auto mt-12">
                 <div class="flex-1 max-w-xs px-4 text-left flex flex-col justify-center">
@@ -542,8 +561,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
                                 <i class="fas fa-map-marker-alt text-white text-base"></i>
                             </div>
                             <div>
-                                <h3 class="text-2xl font-bold text-gray-800 mb-1">Address</h3>
-                                <p class="text-lg text-gray-700 font-semibold"><?php echo nl2br(htmlspecialchars($company_settings['address'])); ?></p>
+
+                                <h3 class="text-base font-semibold text-gray-800 mb-1">Address</h3>
+                                <p class="text-gray-600 text-sm"><?php echo nl2br(htmlspecialchars($company_settings['address'])); ?></p>
+
                             </div>
                         </div>
                         <div class="flex items-start space-x-2">
@@ -551,8 +572,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
                                 <i class="fas fa-phone text-white text-base"></i>
                             </div>
                             <div>
-                                <h3 class="text-2xl font-bold text-gray-800 mb-1">Phone</h3>
-                                <p class="text-lg text-gray-700 font-semibold"><?php echo htmlspecialchars($company_settings['phone']); ?></p>
+
+                                <h3 class="text-base font-semibold text-gray-800 mb-1">Phone</h3>
+                                <p class="text-gray-600 text-sm"><?php echo htmlspecialchars($company_settings['phone']); ?></p>
+
                             </div>
                         </div>
                         <div class="flex items-start space-x-2">
@@ -560,8 +583,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
                                 <i class="fas fa-envelope text-white text-base"></i>
                             </div>
                             <div>
-                                <h3 class="text-2xl font-bold text-gray-800 mb-1">Email</h3>
-                                <p class="text-lg text-gray-700 font-semibold"><?php echo htmlspecialchars($company_settings['email']); ?></p>
+
+                                <h3 class="text-base font-semibold text-gray-800 mb-1">Email</h3>
+                                <p class="text-gray-600 text-sm"><?php echo htmlspecialchars($company_settings['email']); ?></p>
+
                             </div>
                         </div>
                         <?php if ($company_settings['social_facebook'] || $company_settings['social_twitter'] || $company_settings['social_instagram'] || $company_settings['social_linkedin']): ?>
@@ -625,7 +650,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
                             <textarea id="contactMessage" name="message" rows="4" required 
                                       class="w-full px-5 py-4 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all resize-none text-lg"></textarea>
                         </div>
-                        <button type="submit" class="w-full bg-green-600 text-white py-4 rounded-lg hover:bg-green-700 transition-colors font-bold text-xl">
+
+                        <button type="submit" class="w-full bg-green-600 text-white py-3 rounded-lg hover:bg-green-700 transition-colors font-medium">
+
                             <i class="fas fa-paper-plane mr-2"></i>Send Message
                         </button>
                     </form>
@@ -636,6 +663,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
             </div>
         </div>
     </section>
+
 
     <!-- Login Modal -->
     <div id="loginModal" class="fixed inset-0 bg-black bg-opacity-50 hidden z-50 flex items-center justify-center p-4">
@@ -814,18 +842,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
     <?php endif; ?>
 
     <!-- Footer -->
-    <footer class="bg-green-100 text-black py-6 mt-8">
-        <div class="container mx-auto px-6">
-            <div class="grid md:grid-cols-4 gap-6">
-                <div class="col-span-2">
+    <footer class="bg-green-100 text-black py-8 mt-8">
+        <div class="container mx-auto px-8">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8 items-start">
+                <div>
                     <div class="flex items-center mb-3">
                         <?php if (!empty($company_settings['company_logo']) && file_exists($company_settings['company_logo'])): ?>
-                            <img src="<?php echo htmlspecialchars($company_settings['company_logo']) . '?v=' . time(); ?>" alt="<?php echo htmlspecialchars($company_settings['company_name']); ?> Logo" class="h-8 w-auto mr-2">
+                            <img src="<?php echo htmlspecialchars($company_settings['company_logo']) . '?v=' . time(); ?>" alt="<?php echo htmlspecialchars($company_settings['company_name']); ?> Logo" class="h-10 w-auto mr-2">
                         <?php else: ?>
-                            <img src="images/trash-smart-logo.jpg" alt="<?php echo htmlspecialchars($company_settings['company_name']); ?> Logo" class="h-8 w-auto mr-2">
+                            <img src="images/trash-smart-logo.jpg" alt="<?php echo htmlspecialchars($company_settings['company_name']); ?> Logo" class="h-10 w-auto mr-2">
                         <?php endif; ?>
                     </div>
-                    <p class="text-black mb-3 text-sm text-justify leading-relaxed max-w-md" style="max-width:20rem;"><?php echo htmlspecialchars($company_settings['about_us']); ?></p>
+                    <p class="text-black mb-3 text-sm text-justify leading-relaxed max-w-md" style="max-width:22rem;"><?php echo htmlspecialchars($company_settings['about_us']); ?></p>
+
                     <div class="flex space-x-4 mt-1">
                         <a href="#" class="text-black hover:text-white transition-colors">
                             <i class="fab fa-facebook text-2xl"></i>
@@ -863,7 +892,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
                 </div>
             </div>
 
-            <div class="border-t border-green-800 mt-6 pt-4 text-center">
+            <div class="border-t border-green-800 mt-8 pt-4 text-center">
+
                 <p class="text-black text-sm">&copy; 2025 TrashSmart. All rights reserved.</p>
             </div>
         </div>

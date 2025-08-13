@@ -237,33 +237,31 @@ $adminName = $_SESSION['user_name'] ?? 'Admin';
     
     <!-- Header Section -->
     <header class="fixed top-0 left-0 right-0 bg-white shadow-md z-50">
-        <nav class="container mx-auto px-6 py-4 flex justify-between items-center">
+    <nav class="container mx-auto px-8 lg:px-32 py-4 flex justify-between items-center">
             <!-- Logo -->
-            <div class="flex items-center">
-                <img src="images/trash-smart-logo.jpg" alt="TrashSmart Logo" class="h-10 w-auto">
-                <span class="ml-3 text-2xl font-bold text-gray-800">Admin Panel</span>
-            </div>
-            
-            <!-- Navigation Menu -->
-            <div class="hidden md:flex space-x-6">
-                <a href="admin-dashboard.php" class="nav-link text-lg text-gray-700 hover:text-green-600 transition-colors">Dashboard</a>
-                <a href="admin-management.php" class="nav-link text-lg text-gray-700 hover:text-green-600 transition-colors">User Management</a>
-                <a href="company-settings.php" class="nav-link text-lg text-green-600 font-semibold">Company Settings</a>
-            </div>
-            
-            <!-- Admin Info and Logout -->
-            <div class="flex items-center space-x-4">
-                <span class="text-lg text-gray-700">Welcome, <?php echo htmlspecialchars($adminName); ?></span>
-                <a href="../../backend/logout.php" class="text-lg text-red-600 hover:text-red-700 transition-colors">
-                    <i class="fas fa-sign-out-alt mr-2"></i>Logout
-                </a>
+            <div class="flex items-center justify-between w-full">
+                <div class="flex items-center">
+                    <img src="images/trash-smart-logo.jpg" alt="TrashSmart Logo" class="h-10 w-auto">
+                    <span class="ml-3 text-2xl font-bold text-gray-800">Admin Panel</span>
+                </div>
+                <div class="hidden md:flex space-x-6">
+                    <a href="admin-dashboard.php" class="nav-link text-base text-green-600 font-semibold">Dashboard</a>
+                    <a href="admin-management.php" class="nav-link text-base text-gray-700 hover:text-green-600 transition-colors">User Management</a>
+                    <a href="company-settings.php" class="nav-link text-base text-green-600 font-semibold">Company Settings</a>
+                </div>
+                <div class="flex items-center space-x-4">
+                    <span class="text-base text-gray-700">Welcome, <?php echo htmlspecialchars($adminName); ?></span>
+                    <a href="../../backend/logout.php" class="text-base text-amber-900 hover:text-amber-800 transition-colors">
+                        <i class="fas fa-sign-out-alt mr-2"></i>Logout
+                    </a>
+                </div>
             </div>
         </nav>
     </header>
 
     <!-- Main Content -->
-    <main class="pt-20 pb-12">
-        <div class="container mx-auto px-6">
+    <main class="pt-36 pb-12">
+    <div class="container mx-auto px-8 lg:px-32">
             
             <!-- Success/Error Messages -->
             <?php if ($success_message): ?>
@@ -297,23 +295,27 @@ $adminName = $_SESSION['user_name'] ?? 'Admin';
             <?php endif; ?>
 
             <!-- Page Header -->
-            <div class="bg-white rounded-2xl shadow-md p-6 mb-8">
+            <div class="bg-white rounded-2xl shadow-md p-6 mb-20">
                 <div class="flex items-center justify-between">
                     <div>
-                        <h1 class="text-3xl md:text-4xl font-extrabold text-gray-800 mb-4">Company Settings</h1>
-                        <p class="text-lg text-gray-700 mb-2">Customize company information, about us content, and contact details</p>
+
+                        <h1 class="text-5xl font-extrabold text-black mb-4">Company Settings</h1>
+                        <p class="text-xl text-gray-600">Customize company information, about us content, and contact details</p>
+
                     </div>
                     <div class="hidden md:block">
-                        <i class="fas fa-building text-6xl text-blue-600"></i>
+                        <i class="fas fa-building text-6xl text-green-400"></i>
                     </div>
                 </div>
             </div>
 
             <!-- Company Settings Form -->
-            <div class="bg-white rounded-xl shadow-md overflow-hidden">
+            <div class="bg-white rounded-xl shadow-md overflow-hidden mb-20">
                 <div class="p-6 border-b border-gray-200">
-                    <h3 class="text-2xl font-bold text-gray-800 mb-2">
-                        <i class="fas fa-edit text-blue-600 mr-2"></i>
+
+                    <h3 class="text-lg font-semibold text-gray-800">
+                        <i class="fas fa-edit text-green-600 mr-2"></i>
+
                         Update Company Information
                     </h3>
                     <p class="text-sm text-gray-600 mt-2">
@@ -326,9 +328,11 @@ $adminName = $_SESSION['user_name'] ?? 'Admin';
                     <input type="hidden" name="action" value="update_settings">
                     
                     <!-- Images Management Section -->
-                    <div class="bg-blue-50 rounded-xl p-6 mb-8">
-                        <h4 class="text-2xl font-bold text-gray-800 mb-6 flex items-center">
-                            <i class="fas fa-images text-blue-600 mr-3"></i>
+
+                    <div class="bg-green-50 rounded-xl p-6 mb-8">
+                        <h4 class="text-2xl font-bold text-green-600 mb-6 flex items-center">
+                            <i class="fas fa-images text-green-600 mr-3"></i>
+
                             Image Management
                         </h4>
                         <p class="text-lg text-gray-600 mb-6">Upload and manage images for your website's visual content</p>
@@ -359,7 +363,7 @@ $adminName = $_SESSION['user_name'] ?? 'Admin';
                                         <label for="company_logo" class="block text-sm font-medium text-gray-700 mb-2">Upload New Logo</label>
                                         <input type="file" id="company_logo" name="company_logo" 
                                                accept=".jpg,.jpeg,.png,.gif"
-                                               class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                                               class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent">
                                         <p class="text-xs text-gray-500 mt-1">Appears in header & footer</p>
                                     </div>
                                 </div>
@@ -390,7 +394,7 @@ $adminName = $_SESSION['user_name'] ?? 'Admin';
                                         <label for="hero_image" class="block text-sm font-medium text-gray-700 mb-2">Upload Hero Image</label>
                                         <input type="file" id="hero_image" name="hero_image" 
                                                accept=".jpg,.jpeg,.png,.gif"
-                                               class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                                               class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent">
                                         <p class="text-xs text-gray-500 mt-1">Main homepage image (1200x800px)</p>
                                     </div>
                                 </div>
@@ -422,7 +426,7 @@ $adminName = $_SESSION['user_name'] ?? 'Admin';
                                     <label for="about_us_image" class="block text-sm font-medium text-gray-700 mb-2">Upload About Us Image</label>
                                     <input type="file" id="about_us_image" name="about_us_image" 
                                            accept=".jpg,.jpeg,.png,.gif"
-                                           class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                                           class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent">
                                     <p class="text-xs text-gray-500 mt-1">This image appears on the right side of the About section (800x600px recommended)</p>
                                 </div>
                             </div>
@@ -430,176 +434,173 @@ $adminName = $_SESSION['user_name'] ?? 'Admin';
                     </div>
                     
                     <!-- Company Basic Info -->
-                    <div class="grid md:grid-cols-2 gap-6 mb-8">
-                        <div>
-                            <label for="company_name" class="block text-sm font-medium text-gray-700 mb-2">
-                                Company Name <span class="text-red-500">*</span>
-                            </label>
-                            <input type="text" id="company_name" name="company_name" 
-                                   value="<?php echo htmlspecialchars($settings['company_name']); ?>"
-                                   class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                                   required>
-                        </div>
-                        
-                        <div>
-                            <label for="experience_years" class="block text-sm font-medium text-gray-700 mb-2">
-                                Years of Experience <span class="text-gray-400 text-sm">(Optional)</span>
-                            </label>
-                            <input type="number" id="experience_years" name="experience_years" 
-                                   value="<?php echo $settings['experience_years']; ?>"
-                                   class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                                   min="0">
-                        </div>
-                    </div>
-                    
-                    <!-- Statistics -->
-                    <div class="grid md:grid-cols-3 gap-6 mb-8">
-                        <div>
-                            <label for="customers_served" class="block text-sm font-medium text-gray-700 mb-2">
-                                Customers Served <span class="text-gray-400 text-sm">(Optional)</span>
-                            </label>
-                            <input type="text" id="customers_served" name="customers_served" 
-                                   value="<?php echo htmlspecialchars($settings['customers_served']); ?>"
-                                   placeholder="e.g., 10K+"
-                                   class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
-                        </div>
-                        
-                        <div>
-                            <label for="cities_served" class="block text-sm font-medium text-gray-700 mb-2">
-                                Cities Served <span class="text-gray-400 text-sm">(Optional)</span>
-                            </label>
-                            <input type="text" id="cities_served" name="cities_served" 
-                                   value="<?php echo htmlspecialchars($settings['cities_served']); ?>"
-                                   placeholder="e.g., 50+"
-                                   class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
-                        </div>
-                        
-                        <div>
-                            <label for="satisfaction_rate" class="block text-sm font-medium text-gray-700 mb-2">
-                                Satisfaction Rate <span class="text-gray-400 text-sm">(Optional)</span>
-                            </label>
-                            <input type="text" id="satisfaction_rate" name="satisfaction_rate" 
-                                   value="<?php echo htmlspecialchars($settings['satisfaction_rate']); ?>"
-                                   placeholder="e.g., 95%"
-                                   class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                    <div class="mb-8">
+                        <div class="flex flex-col items-center space-y-6">
+                            <div class="w-2/3 flex items-center">
+                                <label for="company_name" class="w-1/3 text-sm font-medium text-gray-700 mr-4 text-left">
+                                    Company Name : <span class="text-red-500">*</span>
+                                </label>
+                                <input type="text" id="company_name" name="company_name" 
+                                       value="<?php echo htmlspecialchars($settings['company_name']); ?>"
+                                       class="w-2/3 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                                       required>
+                            </div>
+                            <div class="w-2/3 flex items-center">
+                                <label for="experience_years" class="w-1/3 text-sm font-medium text-gray-700 mr-4 text-left">
+                                    Years of Experience : <span class="text-gray-400 text-sm">(Optional)</span>
+                                </label>
+                                <input type="number" id="experience_years" name="experience_years" 
+                                       value="<?php echo $settings['experience_years']; ?>"
+                                       class="w-2/3 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                                       min="0">
+                            </div>
+                            <div class="w-2/3 flex items-center">
+                                <label for="customers_served" class="w-1/3 text-sm font-medium text-gray-700 mr-4 text-left">
+                                    Customers Served : <span class="text-gray-400 text-sm">(Optional)</span>
+                                </label>
+                                <input type="text" id="customers_served" name="customers_served" 
+                                       value="<?php echo htmlspecialchars($settings['customers_served']); ?>"
+                                       placeholder="e.g., 10K+"
+                                       class="w-2/3 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent">
+                            </div>
+                            <div class="w-2/3 flex items-center">
+                                <label for="cities_served" class="w-1/3 text-sm font-medium text-gray-700 mr-4 text-left">
+                                    Cities Served : <span class="text-gray-400 text-sm">(Optional)</span>
+                                </label>
+                                <input type="text" id="cities_served" name="cities_served" 
+                                       value="<?php echo htmlspecialchars($settings['cities_served']); ?>"
+                                       placeholder="e.g., 50+"
+                                       class="w-2/3 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent">
+                            </div>
+                            <div class="w-2/3 flex items-center">
+                                <label for="satisfaction_rate" class="w-1/3 text-sm font-medium text-gray-700 mr-4 text-left">
+                                    Satisfaction Rate : <span class="text-gray-400 text-sm">(Optional)</span>
+                                </label>
+                                <input type="text" id="satisfaction_rate" name="satisfaction_rate" 
+                                       value="<?php echo htmlspecialchars($settings['satisfaction_rate']); ?>"
+                                       placeholder="e.g., 95%"
+                                       class="w-2/3 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent mb-12">
+                            </div>
                         </div>
                     </div>
                     
                     <!-- About Us Content -->
                     <div class="mb-8">
-                        <h4 class="text-xl font-bold text-gray-800 mb-4">About Us Content</h4>
-                        
-                        <div class="mb-6">
-                            <label for="company_description" class="block text-sm font-medium text-gray-700 mb-2">
-                                Company Description <span class="text-red-500">*</span>
-                            </label>
-                            <textarea id="company_description" name="company_description" rows="4"
-                                      class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                                      placeholder="Write about your company..." required><?php echo htmlspecialchars($settings['company_description']); ?></textarea>
+
+                        <div class="w-full flex justify-center mb-4">
+                            <h4 class="text-2xl font-bold text-green-600 text-center">About Us Content</h4>
+
                         </div>
-                        
-                        <div class="mb-6">
-                            <label for="mission_statement" class="block text-sm font-medium text-gray-700 mb-2">
-                                Mission Statement <span class="text-gray-400 text-sm">(Optional)</span>
-                            </label>
-                            <textarea id="mission_statement" name="mission_statement" rows="3"
-                                      class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                                      placeholder="Your company's mission statement..."><?php echo htmlspecialchars($settings['mission_statement']); ?></textarea>
+                        <div class="flex flex-col items-center">
+                            <div class="mb-6 w-2/3 flex items-center">
+                                <label for="company_description" class="w-1/3 text-sm font-medium text-gray-700 mr-4 text-left">
+                                    Company Description : <span class="text-red-500">*</span>
+                                </label>
+                                <textarea id="company_description" name="company_description" rows="4"
+                                          class="w-2/3 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                                          placeholder="Write about your company..." required><?php echo htmlspecialchars($settings['company_description']); ?></textarea>
+                            </div>
+                            <div class="mb-6 w-2/3 flex items-center">
+                                <label for="mission_statement" class="w-1/3 text-sm font-medium text-gray-700 mr-4 text-left">
+                                    Mission Statement : <span class="text-gray-400 text-sm">(Optional)</span>
+                                </label>
+                                <textarea id="mission_statement" name="mission_statement" rows="3"
+                                          class="w-2/3 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                                          placeholder="Your company's mission statement..."><?php echo htmlspecialchars($settings['mission_statement']); ?></textarea>
+                            </div>
                         </div>
                     </div>
                     
                     <!-- Contact Information -->
-                    <div class="mb-8">
-                        <h4 class="text-xl font-bold text-gray-800 mb-4">Contact Information</h4>
-                        
-                        <div class="grid md:grid-cols-2 gap-6">
-                            <div>
-                                <label for="contact_phone" class="block text-sm font-medium text-gray-700 mb-2">
-                                    Phone Number <span class="text-gray-400 text-sm">(Optional)</span>
+
+                    <div class="mt-16 mb-16">
+                        <div class="w-full flex justify-center mb-4">
+                            <h4 class="text-2xl font-bold text-green-600 text-center">Contact Information</h4>
+                        </div>
+                        <div class="flex flex-col items-center space-y-6">
+                            <div class="w-2/3 flex items-center">
+                                <label for="contact_phone" class="w-1/3 text-sm font-medium text-gray-700 mr-4 text-left">
+                                    Phone Number : <span class="text-gray-400 text-sm">(Optional)</span>
+
                                 </label>
                                 <input type="tel" id="contact_phone" name="contact_phone" 
                                        value="<?php echo htmlspecialchars($settings['contact_phone']); ?>"
-                                       class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                                       class="w-2/3 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent">
                             </div>
-                            
-                            <div>
-                                <label for="contact_email" class="block text-sm font-medium text-gray-700 mb-2">
-                                    Email Address <span class="text-gray-400 text-sm">(Optional)</span>
+                            <div class="w-2/3 flex items-center">
+                                <label for="contact_email" class="w-1/3 text-sm font-medium text-gray-700 mr-4 text-left">
+                                    Email Address : <span class="text-gray-400 text-sm">(Optional)</span>
                                 </label>
                                 <input type="email" id="contact_email" name="contact_email" 
                                        value="<?php echo htmlspecialchars($settings['contact_email']); ?>"
-                                       class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                                       class="w-2/3 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent">
                             </div>
-                        </div>
-                        
-                        <div class="mt-6">
-                            <label for="contact_address" class="block text-sm font-medium text-gray-700 mb-2">
-                                Business Address <span class="text-gray-400 text-sm">(Optional)</span>
-                            </label>
-                            <textarea id="contact_address" name="contact_address" rows="3"
-                                      class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                                      placeholder="Your business address..."><?php echo htmlspecialchars($settings['contact_address']); ?></textarea>
+                            <div class="w-2/3 flex items-center">
+                                <label for="contact_address" class="w-1/3 text-sm font-medium text-gray-700 mr-4 text-left">
+                                    Business Address : <span class="text-gray-400 text-sm">(Optional)</span>
+                                </label>
+                                <textarea id="contact_address" name="contact_address" rows="3"
+                                          class="w-2/3 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                                          placeholder="Your business address..."><?php echo htmlspecialchars($settings['contact_address']); ?></textarea>
+                            </div>
                         </div>
                     </div>
                     
                     <!-- Social Media Links -->
-                    <div class="mb-8">
-                        <div class="flex items-center justify-between mb-4">
-                            <h4 class="text-xl font-bold text-gray-800">Social Media Links</h4>
-                            <span class="text-sm text-gray-500 bg-gray-100 px-3 py-1 rounded-full">All Optional</span>
+
+                    <div class="mt-16 mb-16">
+                        <div class="w-full flex justify-center mb-4">
+                            <h4 class="text-2xl font-bold text-green-600 text-center">Social Media Links</h4>
+
                         </div>
-                        
-                        <div class="grid md:grid-cols-2 gap-6">
-                            <div>
-                                <label for="facebook_url" class="block text-sm font-medium text-gray-700 mb-2">
-                                    <i class="fab fa-facebook text-blue-600 mr-2"></i>Facebook URL <span class="text-gray-400 text-sm">(Optional)</span>
+                        <div class="flex flex-col items-center space-y-6">
+                            <div class="w-2/3 flex items-center">
+                                <label for="facebook_url" class="w-1/3 text-sm font-medium text-gray-700 mr-4 text-left">
+                                    <i class="fab fa-facebook text-green-600 mr-2"></i>Facebook URL : <span class="text-gray-400 text-sm">(Optional)</span>
                                 </label>
                                 <input type="url" id="facebook_url" name="facebook_url" 
                                        value="<?php echo htmlspecialchars($settings['facebook_url']); ?>"
                                        placeholder="https://facebook.com/yourcompany"
-                                       class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                                       class="w-2/3 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent">
                             </div>
-                            
-                            <div>
-                                <label for="instagram_url" class="block text-sm font-medium text-gray-700 mb-2">
-                                    <i class="fab fa-instagram text-pink-600 mr-2"></i>Instagram URL <span class="text-gray-400 text-sm">(Optional)</span>
+                            <div class="w-2/3 flex items-center">
+                                <label for="instagram_url" class="w-1/3 text-sm font-medium text-gray-700 mr-4 text-left">
+                                    <i class="fab fa-instagram text-pink-600 mr-2"></i>Instagram URL : <span class="text-gray-400 text-sm">(Optional)</span>
                                 </label>
                                 <input type="url" id="instagram_url" name="instagram_url" 
                                        value="<?php echo htmlspecialchars($settings['instagram_url']); ?>"
                                        placeholder="https://instagram.com/yourcompany"
-                                       class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                                       class="w-2/3 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent">
                             </div>
-                            
-                            <div>
-                                <label for="twitter_url" class="block text-sm font-medium text-gray-700 mb-2">
-                                    <i class="fab fa-twitter text-blue-400 mr-2"></i>Twitter URL <span class="text-gray-400 text-sm">(Optional)</span>
+                            <div class="w-2/3 flex items-center">
+                                <label for="twitter_url" class="w-1/3 text-sm font-medium text-gray-700 mr-4 text-left">
+                                    <i class="fab fa-twitter text-green-400 mr-2"></i>Twitter URL : <span class="text-gray-400 text-sm">(Optional)</span>
                                 </label>
                                 <input type="url" id="twitter_url" name="twitter_url" 
                                        value="<?php echo htmlspecialchars($settings['twitter_url']); ?>"
                                        placeholder="https://twitter.com/yourcompany"
-                                       class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                                       class="w-2/3 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent">
                             </div>
-                            
-                            <div>
-                                <label for="linkedin_url" class="block text-sm font-medium text-gray-700 mb-2">
-                                    <i class="fab fa-linkedin text-blue-700 mr-2"></i>LinkedIn URL <span class="text-gray-400 text-sm">(Optional)</span>
+                            <div class="w-2/3 flex items-center">
+                                <label for="linkedin_url" class="w-1/3 text-sm font-medium text-gray-700 mr-4 text-left">
+                                    <i class="fab fa-linkedin text-green-700 mr-2"></i>LinkedIn URL : <span class="text-gray-400 text-sm">(Optional)</span>
                                 </label>
                                 <input type="url" id="linkedin_url" name="linkedin_url" 
                                        value="<?php echo htmlspecialchars($settings['linkedin_url']); ?>"
                                        placeholder="https://linkedin.com/company/yourcompany"
-                                       class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                                       class="w-2/3 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent">
                             </div>
                         </div>
                     </div>
                     
                     <!-- Submit Button -->
-                    <div class="flex justify-end space-x-4">
+                    <div class="flex justify-center space-x-4 mt-8">
                         <a href="admin-management.php" 
                            class="px-6 py-3 bg-gray-500 text-white rounded-lg hover:bg-gray-600 transition-colors">
                             <i class="fas fa-arrow-left mr-2"></i>Back to User Management
                         </a>
                         <button type="submit" 
-                                class="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
+                                class="px-6 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors">
                             <i class="fas fa-save mr-2"></i>Save Settings
                         </button>
                     </div>
