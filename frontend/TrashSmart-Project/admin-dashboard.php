@@ -259,7 +259,7 @@ $adminName = $_SESSION['user_name'] ?? 'Admin';
             <!-- Navigation Menu -->
             <div class="hidden md:flex space-x-6">
                 <a href="admin-dashboard.php" class="nav-link text-base text-green-600 font-semibold">Dashboard</a>
-                <a href="admin-management.php" class="nav-link text-base text-gray-700 hover:text-green-600 transition-colors">User Management</a>
+                <a href="admin-management.php" class="nav-link text-base text-gray-700 hover:text-green-600 transition-colors">Citizen Management</a>
                 <a href="company-settings.php" class="nav-link text-base text-gray-700 hover:text-green-600 transition-colors">Company Settings</a>
             </div>
             
@@ -396,12 +396,12 @@ $adminName = $_SESSION['user_name'] ?? 'Admin';
                     
                     <!-- Action Buttons -->
                     <div class="flex items-end space-x-2">
-                        <button type="submit" class="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition-colors">
+                        <button type="submit" class="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition-colors text-sm font-medium flex items-center">
                             <i class="fas fa-filter mr-2"></i>Filter
                         </button>
-                        <a href="admin-dashboard.php" class="bg-gray-600 text-white px-4 py-2 rounded-lg hover:bg-gray-700 transition-colors">
-                            <i class="fas fa-refresh mr-2"></i>Reset
-                        </a>
+                        <button type="reset" class="bg-gray-400 text-white px-4 py-2 rounded-lg hover:bg-gray-500 transition-colors text-sm font-medium flex items-center">
+                            <i class="fas fa-undo mr-2"></i>Reset
+                        </button>
                     </div>
                 </form>
             </div>
@@ -496,7 +496,7 @@ $adminName = $_SESSION['user_name'] ?? 'Admin';
                                                     $status_class = 'bg-green-100 text-green-800';
                                                     break;
                                                 case 'rejected':
-                                                    $status_class = 'bg-red-100 text-red-800';
+                                                    $status_class = 'bg-brown-100 text-brown-800';
                                                     break;
                                             }
                                             ?>
@@ -538,7 +538,7 @@ $adminName = $_SESSION['user_name'] ?? 'Admin';
                                                     <input type="hidden" name="status" value="rejected">
                                                     <button type="submit" <?php echo $request['status'] === 'rejected' || $request['status'] === 'collected' ? 'disabled' : ''; ?>
                                                             onclick="return confirm('Are you sure you want to reject this request?')"
-                                                            class="w-full px-3 py-1 text-xs bg-red-600 text-white rounded hover:bg-red-700 transition-colors <?php echo $request['status'] === 'rejected' || $request['status'] === 'collected' ? 'opacity-50 cursor-not-allowed' : ''; ?>">
+                                                            class="w-full px-3 py-1 text-xs bg-brown-600 text-white rounded hover:bg-brown-700 transition-colors <?php echo $request['status'] === 'rejected' || $request['status'] === 'collected' ? 'opacity-50 cursor-not-allowed' : ''; ?>">
                                                         <i class="fas fa-times mr-1"></i>Reject
                                                     </button>
                                                 </form>
@@ -580,7 +580,7 @@ $adminName = $_SESSION['user_name'] ?? 'Admin';
             <div class="bg-white rounded-xl shadow-md overflow-hidden">
                 <div class="p-8 border-b border-gray-200">
                     <h3 class="text-2xl font-bold text-gray-800">
-                        <i class="fas fa-times-circle text-red-600 mr-2"></i>
+                        <i class="fas fa-times-circle text-brown-600 mr-2"></i>
                         Rejected Requests
                         <span class="text-lg text-gray-500 ml-2">(<?php echo count($rejected_requests); ?> records)</span>
                     </h3>
@@ -637,7 +637,7 @@ $adminName = $_SESSION['user_name'] ?? 'Admin';
                                                 <strong>Address:</strong> <?php echo htmlspecialchars(substr($request['pickup_address'], 0, 50)) . (strlen($request['pickup_address']) > 50 ? '...' : ''); ?>
                                             </div>
                                             <?php if ($request['admin_notes']): ?>
-                                                <div class="text-xs text-red-600 mt-1">
+                                                <div class="text-xs text-brown-600 mt-1">
                                                     <strong>Reason:</strong> <?php echo htmlspecialchars($request['admin_notes']); ?>
                                                 </div>
                                             <?php endif; ?>
@@ -662,7 +662,7 @@ $adminName = $_SESSION['user_name'] ?? 'Admin';
                                         
                                         <!-- Status -->
                                         <td class="px-6 py-4 whitespace-nowrap">
-                                            <span class="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-red-100 text-red-800">
+                                            <span class="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-brown-100 text-brown-800">
                                                 Rejected
                                             </span>
                                         </td>
@@ -674,7 +674,7 @@ $adminName = $_SESSION['user_name'] ?? 'Admin';
                                                 <input type="hidden" name="request_id" value="<?php echo $request['request_id']; ?>">
                                                 <button type="submit"
                                                         onclick="return confirm('Are you sure you want to permanently delete this rejected request? This action cannot be undone.')"
-                                                        class="bg-red-600 text-white px-3 py-1.5 rounded-md hover:bg-red-700 transition-colors text-xs font-medium">
+                                                        class="bg-brown-600 text-white px-3 py-1.5 rounded-md hover:bg-brown-700 transition-colors text-xs font-medium">
                                                     <i class="fas fa-trash mr-1"></i>Delete
                                                 </button>
                                             </form>

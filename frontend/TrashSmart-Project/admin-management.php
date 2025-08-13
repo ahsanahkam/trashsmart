@@ -295,8 +295,8 @@ $conn->close();
                     <span class="ml-3 text-2xl font-bold text-gray-800">Admin Panel</span>
                 </div>
                 <div class="hidden md:flex space-x-6">
-                    <a href="admin-dashboard.php" class="nav-link text-base text-green-600 font-semibold">Dashboard</a>
-                    <a href="admin-management.php" class="nav-link text-base text-gray-700 hover:text-green-600 transition-colors">User Management</a>
+                    <a href="admin-dashboard.php" class="nav-link text-base text-gray-700 hover:text-green-600 font-semibold">Dashboard</a>
+                    <a href="admin-management.php" class="nav-link text-base text-green-600 font-semibold">Citizen Management</a>
                     <a href="company-settings.php" class="nav-link text-base text-gray-700 hover:text-green-600 transition-colors">Company Settings</a>
                 </div>
                 <div class="flex items-center space-x-4">
@@ -439,24 +439,21 @@ $conn->close();
                     
                     <!-- Action Buttons -->
                     <div class="flex items-end space-x-2">
-                        <button type="submit" class="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition-colors">
+                        <button type="submit" class="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition-colors text-sm font-medium flex items-center">
                             <i class="fas fa-search mr-2"></i>Search
                         </button>
-                        <a href="admin-management.php" class="bg-gray-600 text-white px-4 py-2 rounded-lg hover:bg-gray-700 transition-colors">
-                            <i class="fas fa-refresh mr-2"></i>Reset
-                        </a>
+                        <button type="reset" class="bg-gray-400 text-white px-4 py-2 rounded-lg hover:bg-gray-500 transition-colors text-sm font-medium flex items-center">
+                            <i class="fas fa-undo mr-2"></i>Reset
+                        </button>
                     </div>
                 </form>
             </div>
 
-            <!-- Citizens Table -->
-            <div class="bg-white rounded-xl shadow-md overflow-hidden">
-                <div class="p-6 border-b border-gray-200">
-                    <h3 class="text-2xl font-semibold text-gray-800">
-                        <i class="fas fa-table text-green-600 mr-2"></i>Registered Citizens
-                        <span class="text-lg text-gray-500 ml-2">(<?php echo count($citizens); ?> records)</span>
-                    </h3>
-                </div>
+            <!-- Registered Citizens Section -->
+            <div class="bg-white rounded-xl shadow-md p-8 mb-12">
+                <h3 class="text-2xl font-bold text-green-600 mb-6">
+                    <i class="fas fa-table text-green-600 mr-2"></i>Registered Citizens
+                </h3>
                 
                 <?php if (empty($citizens)): ?>
                     <div class="text-center py-12">
@@ -580,15 +577,12 @@ $conn->close();
                     </div>
                 <?php endif; ?>
             </div>
-
+            <div class="my-8"></div>
             <!-- Contact Messages Section -->
-            <div class="bg-white rounded-xl shadow-md overflow-hidden mb-12">
-                <div class="p-6 border-b border-gray-200">
-                    <h3 class="text-2xl font-semibold text-gray-800">
-                        <i class="fas fa-envelope text-green-600 mr-2"></i>Contact Messages
-                        <span class="text-lg text-gray-500 ml-2">(<?php echo count($messages); ?> records)</span>
-                    </h3>
-                </div>
+            <div class="bg-white rounded-xl shadow-md p-8 mb-12">
+                <h3 class="text-2xl font-bold text-green-600 mb-6">
+                    <i class="fas fa-envelope text-green-600 mr-2"></i>Contact Messages
+                </h3>
                 <?php if (empty($messages)): ?>
                     <div class="text-center py-12">
                         <i class="fas fa-inbox text-4xl text-gray-400 mb-4"></i>
