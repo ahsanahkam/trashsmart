@@ -40,16 +40,41 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
         // Validate status
         if (in_array($new_status, ['pending', 'accepted', 'collected', 'rejected', 'cancelled'])) {
             if ($new_status === 'collected') {
-            // For collected status, delete the record entirely
-            $stmt = $conn->prepare("DELETE FROM pending_requests WHERE request_id = ?");
-            $stmt->bind_param("i", $request_id);
-            
-            if ($stmt->execute()) {
-                $success_message = "Request #$request_id has been collected and record deleted successfully!";
+                // Ensure collected_requests table exists
+                $conn->query("CREATE TABLE IF NOT EXISTS collected_requests (
+                    collected_id INT AUTO_INCREMENT PRIMARY KEY,
+                    request_id INT NOT NULL,
+                    user_id INT NOT NULL,
+                    waste_type VARCHAR(100),
+                    pickup_address VARCHAR(255),
+                    preferred_pickup_date DATE,
+                    pickup_time VARCHAR(20),
+                    special_instructions TEXT,
+                    weight_category VARCHAR(50),
+                    created_at DATETIME,
+                    collected_at DATETIME DEFAULT CURRENT_TIMESTAMP
+                ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4");
+
+                // Copy the request into collected_requests
+                $insert_sql = "INSERT INTO collected_requests (request_id, user_id, waste_type, pickup_address, preferred_pickup_date, pickup_time, special_instructions, weight_category, created_at)
+                                SELECT request_id, user_id, waste_type, pickup_address, preferred_pickup_date, pickup_time, special_instructions, weight_category, created_at
+                                FROM pending_requests WHERE request_id = ?";
+                $stmt = $conn->prepare($insert_sql);
+                $stmt->bind_param("i", $request_id);
+                if ($stmt->execute()) {
+                    $stmt->close();
+                    // Remove the original pending record
+                    $stmt = $conn->prepare("DELETE FROM pending_requests WHERE request_id = ?");
+                    $stmt->bind_param("i", $request_id);
+                    if ($stmt->execute()) {
+                        $success_message = "Request #$request_id marked as collected.";
+                    } else {
+                        $error_message = "Failed to remove collected request from pending.";
+                    }
+                } else {
+                    $error_message = "Failed to archive collected request.";
+                }
             } else {
-                $error_message = "Failed to delete collected request.";
-            }
-        } else {
             // Normal status update for all other statuses (pending, accepted, rejected)
             $stmt = $conn->prepare("UPDATE pending_requests SET status = ?, admin_notes = ?, handled_by_admin = ?, updated_at = NOW() WHERE request_id = ?");
             $stmt->bind_param("ssii", $new_status, $admin_notes, $_SESSION['user_id'], $request_id);
@@ -59,11 +84,37 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
             } else {
                 $error_message = "Failed to update request status.";
             }
-        }
+            }
             $stmt->close();
         } else {
             $error_message = "Invalid status value.";
         }
+    }
+
+    // Delete collected record
+    if ($_POST['action'] === 'delete_collected' && isset($_POST['collected_id'])) {
+        $collected_id = intval($_POST['collected_id']);
+        $conn->query("CREATE TABLE IF NOT EXISTS collected_requests (
+            collected_id INT AUTO_INCREMENT PRIMARY KEY,
+            request_id INT NOT NULL,
+            user_id INT NOT NULL,
+            waste_type VARCHAR(100),
+            pickup_address VARCHAR(255),
+            preferred_pickup_date DATE,
+            pickup_time VARCHAR(20),
+            special_instructions TEXT,
+            weight_category VARCHAR(50),
+            created_at DATETIME,
+            collected_at DATETIME DEFAULT CURRENT_TIMESTAMP
+        ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4");
+        $stmt = $conn->prepare("DELETE FROM collected_requests WHERE collected_id = ?");
+        $stmt->bind_param("i", $collected_id);
+        if ($stmt->execute()) {
+            $success_message = "Collected record deleted.";
+        } else {
+            $error_message = "Failed to delete collected record.";
+        }
+        $stmt->close();
     }
     
     $conn->close();
@@ -208,18 +259,65 @@ $districts_query = "SELECT DISTINCT district FROM users WHERE district IS NOT NU
 $result = $conn->query($districts_query);
 $districts = $result->fetch_all(MYSQLI_ASSOC);
 
+
 // Get summary statistics
-$stats_query = "
-    SELECT 
-        COUNT(*) as total_requests,
-        SUM(CASE WHEN status = 'pending' THEN 1 ELSE 0 END) as pending_requests,
-        SUM(CASE WHEN status = 'collected' THEN 1 ELSE 0 END) as collected_requests,
-        SUM(CASE WHEN status = 'rejected' THEN 1 ELSE 0 END) as rejected_requests,
-        SUM(CASE WHEN status = 'accepted' THEN 1 ELSE 0 END) as accepted_requests
-    FROM pending_requests
-";
-$result = $conn->query($stats_query);
-$stats = $result->fetch_assoc();
+$stats = [
+    'total_requests' => 0,
+    'pending_requests' => 0,
+    'collected_requests' => 0,
+    'rejected_requests' => 0,
+    'accepted_requests' => 0
+];
+
+// Total requests (pending + collected)
+$result = $conn->query("SELECT COUNT(*) as total FROM pending_requests");
+if ($result) {
+    $row = $result->fetch_assoc();
+    $stats['total_requests'] += (int)$row['total'];
+}
+$result = $conn->query("SELECT COUNT(*) as total FROM collected_requests");
+if ($result) {
+    $row = $result->fetch_assoc();
+    $stats['total_requests'] += (int)$row['total'];
+    $stats['collected_requests'] = (int)$row['total'];
+}
+
+// Pending, rejected, accepted from pending_requests
+$result = $conn->query("SELECT 
+    SUM(CASE WHEN status = 'pending' THEN 1 ELSE 0 END) as pending_requests,
+    SUM(CASE WHEN status = 'rejected' THEN 1 ELSE 0 END) as rejected_requests,
+    SUM(CASE WHEN status = 'accepted' THEN 1 ELSE 0 END) as accepted_requests
+    FROM pending_requests");
+if ($result) {
+    $row = $result->fetch_assoc();
+    $stats['pending_requests'] = (int)$row['pending_requests'];
+    $stats['rejected_requests'] = (int)$row['rejected_requests'];
+    $stats['accepted_requests'] = (int)$row['accepted_requests'];
+}
+
+// Build and fetch collected requests
+$collected_requests = [];
+$conn->query("CREATE TABLE IF NOT EXISTS collected_requests (
+    collected_id INT AUTO_INCREMENT PRIMARY KEY,
+    request_id INT NOT NULL,
+    user_id INT NOT NULL,
+    waste_type VARCHAR(100),
+    pickup_address VARCHAR(255),
+    preferred_pickup_date DATE,
+    pickup_time VARCHAR(20),
+    special_instructions TEXT,
+    weight_category VARCHAR(50),
+    created_at DATETIME,
+    collected_at DATETIME DEFAULT CURRENT_TIMESTAMP
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4");
+
+$collected_sql = "SELECT cr.*, u.first_name, u.last_name, u.email FROM collected_requests cr LEFT JOIN users u ON cr.user_id = u.user_id ORDER BY cr.collected_at DESC";
+$result = $conn->query($collected_sql);
+if ($result) {
+    while ($row = $result->fetch_assoc()) {
+        $collected_requests[] = $row;
+    }
+}
 
 $conn->close();
 
@@ -687,7 +785,58 @@ $adminName = $_SESSION['user_name'] ?? 'Admin';
                 <?php endif; ?>
             </div>
 
-        </div>
+            <!-- Collected Trash Table -->
+            <div class="bg-white rounded-xl shadow-md overflow-hidden mt-12">
+                <div class="p-8 border-b border-gray-200">
+                    <h3 class="text-2xl font-bold text-gray-800">
+                        <i class="fas fa-recycle text-green-600 mr-2"></i>
+                        Collected Trash
+                        <span class="text-lg text-gray-500 ml-2">(<?php echo count($collected_requests); ?> records)</span>
+                    </h3>
+                </div>
+                <?php if (empty($collected_requests)): ?>
+                    <div class="text-center py-16">
+                        <i class="fas fa-box-open text-5xl text-gray-400 mb-6"></i>
+                        <h4 class="text-2xl font-bold text-gray-600 mb-4">No collected records</h4>
+                        <p class="text-lg text-gray-500">Collected requests will appear here after archiving.</p>
+                    </div>
+                <?php else: ?>
+                    <div class="overflow-x-auto">
+                        <table class="min-w-full divide-y divide-gray-200">
+                            <thead class="bg-gray-50">
+                                <tr>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">#</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Citizen</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Waste Type</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Address</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Collected At</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody class="bg-white divide-y divide-gray-200">
+                                <?php foreach ($collected_requests as $cr): ?>
+                                <tr class="hover:bg-gray-50">
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">#<?php echo (int)$cr['request_id']; ?></td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900"><?php echo htmlspecialchars(trim(($cr['first_name'] ?? '').' '.($cr['last_name'] ?? ''))); ?><div class="text-xs text-gray-500"><?php echo htmlspecialchars($cr['email'] ?? ''); ?></div></td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900"><?php echo htmlspecialchars($cr['waste_type'] ?? ''); ?></td>
+                                    <td class="px-6 py-4 text-sm text-gray-700 max-w-md break-words"><?php echo htmlspecialchars($cr['pickup_address'] ?? ''); ?></td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900"><?php echo isset($cr['collected_at']) ? date('M j, Y g:i A', strtotime($cr['collected_at'])) : ''; ?></td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                                        <form method="POST" onsubmit="return confirm('Delete this collected record? This cannot be undone.')">
+                                            <input type="hidden" name="action" value="delete_collected">
+                                            <input type="hidden" name="collected_id" value="<?php echo (int)$cr['collected_id']; ?>">
+                                            <button type="submit" class="text-red-600 hover:text-red-800"><i class="fas fa-trash"></i></button>
+                                        </form>
+                                    </td>
+                                </tr>
+                                <?php endforeach; ?>
+                            </tbody>
+                        </table>
+                    </div>
+                <?php endif; ?>
+            </div>
+
+    </div>
     </main>
 
     <!-- Footer -->

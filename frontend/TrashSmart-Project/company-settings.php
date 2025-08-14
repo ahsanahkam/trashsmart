@@ -31,10 +31,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
     $contact_phone = trim($_POST['contact_phone']);
     $contact_email = trim($_POST['contact_email']);
     $contact_address = trim($_POST['contact_address']);
-    $facebook_url = trim($_POST['facebook_url']);
-    $instagram_url = trim($_POST['instagram_url']);
-    $twitter_url = trim($_POST['twitter_url']);
-    $linkedin_url = trim($_POST['linkedin_url']);
+    // Social media fields removed
     
     // Handle company logo upload
     $company_logo_url = '';
@@ -148,7 +145,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
         $existing_logo = '';
         $existing_about_image = '';
         $existing_hero_image = '';
-        $existing_query = "SELECT company_logo_url, about_us_image_url, hero_image_url FROM about_us LIMIT 1";
+    $existing_query = "SELECT company_logo_url, about_us_image_url, hero_image_url FROM about_us LIMIT 1";
         $existing_result = $conn->query($existing_query);
         if ($existing_result && $existing_row = $existing_result->fetch_assoc()) {
             $existing_logo = $existing_row['company_logo_url'] ?? '';
@@ -165,8 +162,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
         $conn->query("DELETE FROM about_us");
         
         // Insert the single company settings record
-        $stmt = $conn->prepare("INSERT INTO about_us (company_name, company_description, mission_statement, experience_years, customers_served, cities_served, satisfaction_rate, contact_phone, contact_email, contact_address, facebook_url, instagram_url, twitter_url, linkedin_url, company_logo_url, about_us_image_url, hero_image_url, updated_by_admin) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
-        $stmt->bind_param("sssisssssssssssssi", $company_name, $company_description, $mission_statement, $experience_years, $customers_served, $cities_served, $satisfaction_rate, $contact_phone, $contact_email, $contact_address, $facebook_url, $instagram_url, $twitter_url, $linkedin_url, $final_logo_url, $final_about_image_url, $final_hero_image_url, $_SESSION['user_id']);
+    $stmt = $conn->prepare("INSERT INTO about_us (company_name, company_description, mission_statement, experience_years, customers_served, cities_served, satisfaction_rate, contact_phone, contact_email, contact_address, company_logo_url, about_us_image_url, hero_image_url, updated_by_admin) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+    // Types: s s s i s s s s s s s s s i (14 params: 12 strings and 2 integers)
+    $stmt->bind_param("sssisssssssssi", $company_name, $company_description, $mission_statement, $experience_years, $customers_served, $cities_served, $satisfaction_rate, $contact_phone, $contact_email, $contact_address, $final_logo_url, $final_about_image_url, $final_hero_image_url, $_SESSION['user_id']);
         
         if ($stmt->execute()) {
             $success_message = "Company settings updated successfully!";
@@ -199,10 +197,7 @@ if ($result && $result->num_rows > 0) {
         'contact_phone' => '',
         'contact_email' => '',
         'contact_address' => '',
-        'facebook_url' => '',
-        'instagram_url' => '',
-        'twitter_url' => '',
-        'linkedin_url' => '',
+    // Social links removed from defaults
         'company_logo_url' => '',
         'about_us_image_url' => '',
         'hero_image_url' => ''
@@ -406,7 +401,7 @@ $adminName = $_SESSION['user_name'] ?? 'Admin';
                             <h5 class="text-xl font-bold text-gray-800 mb-4">About Us Section Image</h5>
                             
                             <div class="flex items-center space-x-6">
-                                <?php if (!empty($settings['about_us_image_url']) && file_exists($settings['about_us_image_url'])): ?>
+                                <?php if (!empty($settings['about_us_image_url'])): ?>
                                     <div class="flex-shrink-0">
                                         <img src="<?php echo htmlspecialchars($settings['about_us_image_url']) . '?v=' . time(); ?>" 
                                              alt="Current About Us Image" 
@@ -546,59 +541,10 @@ $adminName = $_SESSION['user_name'] ?? 'Admin';
                         </div>
                     </div>
                     
-                    <!-- Social Media Links -->
-
-                    <div class="mt-16 mb-16">
-                        <div class="w-full flex justify-center mb-4">
-                            <h4 class="text-2xl font-bold text-green-600 text-center">Social Media Links</h4>
-
-                        </div>
-                        <div class="flex flex-col items-center space-y-6">
-                            <div class="w-2/3 flex items-center">
-                                <label for="facebook_url" class="w-1/3 text-sm font-medium text-gray-700 mr-4 text-left">
-                                    <i class="fab fa-facebook text-green-600 mr-2"></i>Facebook URL : <span class="text-gray-400 text-sm">(Optional)</span>
-                                </label>
-                                <input type="url" id="facebook_url" name="facebook_url" 
-                                       value="<?php echo htmlspecialchars($settings['facebook_url']); ?>"
-                                       placeholder="https://facebook.com/yourcompany"
-                                       class="w-2/3 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent">
-                            </div>
-                            <div class="w-2/3 flex items-center">
-                                <label for="instagram_url" class="w-1/3 text-sm font-medium text-gray-700 mr-4 text-left">
-                                    <i class="fab fa-instagram text-pink-600 mr-2"></i>Instagram URL : <span class="text-gray-400 text-sm">(Optional)</span>
-                                </label>
-                                <input type="url" id="instagram_url" name="instagram_url" 
-                                       value="<?php echo htmlspecialchars($settings['instagram_url']); ?>"
-                                       placeholder="https://instagram.com/yourcompany"
-                                       class="w-2/3 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent">
-                            </div>
-                            <div class="w-2/3 flex items-center">
-                                <label for="twitter_url" class="w-1/3 text-sm font-medium text-gray-700 mr-4 text-left">
-                                    <i class="fab fa-twitter text-green-400 mr-2"></i>Twitter URL : <span class="text-gray-400 text-sm">(Optional)</span>
-                                </label>
-                                <input type="url" id="twitter_url" name="twitter_url" 
-                                       value="<?php echo htmlspecialchars($settings['twitter_url']); ?>"
-                                       placeholder="https://twitter.com/yourcompany"
-                                       class="w-2/3 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent">
-                            </div>
-                            <div class="w-2/3 flex items-center">
-                                <label for="linkedin_url" class="w-1/3 text-sm font-medium text-gray-700 mr-4 text-left">
-                                    <i class="fab fa-linkedin text-green-700 mr-2"></i>LinkedIn URL : <span class="text-gray-400 text-sm">(Optional)</span>
-                                </label>
-                                <input type="url" id="linkedin_url" name="linkedin_url" 
-                                       value="<?php echo htmlspecialchars($settings['linkedin_url']); ?>"
-                                       placeholder="https://linkedin.com/company/yourcompany"
-                                       class="w-2/3 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent">
-                            </div>
-                        </div>
-                    </div>
+                    
                     
                     <!-- Submit Button -->
-                    <div class="flex justify-center space-x-4 mt-8">
-                        <a href="admin-management.php" 
-                           class="px-6 py-3 bg-gray-500 text-white rounded-lg hover:bg-gray-600 transition-colors">
-                            <i class="fas fa-arrow-left mr-2"></i><span class="text-sm">Back to Citizen Management</span>
-                        </a>
+                    <div class="flex justify-center mt-8">
                         <button type="submit" 
                                 class="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition-colors text-sm font-medium flex items-center">
                             <i class="fas fa-save mr-2"></i>Save Changes
