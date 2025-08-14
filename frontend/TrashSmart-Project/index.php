@@ -44,8 +44,9 @@ if ($db_settings) {
         'social_twitter' => $db_settings['twitter_url'] ?? '',
         'social_instagram' => $db_settings['instagram_url'] ?? '',
         'social_linkedin' => $db_settings['linkedin_url'] ?? '',
-        'stat_citizens' => $db_settings['customers_served'] ?? '10K+',
-        'stat_pickups' => '25K+', // This can be a calculated field later
+    'stat_citizens' => $db_settings['customers_served'] ?? '10K+',
+    // Use the same source for now so the UI reflects Company Settings accurately
+    'stat_pickups' => $db_settings['customers_served'] ?? '10K+',
         'stat_partners' => $db_settings['cities_served'] ?? '50+',
         'stat_satisfaction' => $db_settings['satisfaction_rate'] ?? '95%',
         'company_logo' => $db_settings['company_logo_url'] ?? '',
@@ -86,7 +87,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
     } else {
         $conn = getDatabaseConnection();
         
-    $stmt = $conn->prepare("SELECT user_id, first_name, last_name, email, password, user_type FROM users WHERE email = ?");
+    $stmt = $conn->prepare("SELECT user_id, first_name, last_name, email, password, user_type, status FROM users WHERE email = ?");
         $stmt->bind_param("s", $email);
         $stmt->execute();
         $result = $stmt->get_result();
@@ -97,8 +98,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
             $storedHashOrPlain = $user['password'];
             $isValid = false;
 
-            // Preferred: verify against a hash
-            if (!empty($storedHashOrPlain) && password_verify($password, $storedHashOrPlain)) {
+            // Block suspended accounts
+            if (isset($user['status']) && strtolower((string)$user['status']) === 'suspended') {
+                $login_error = "Your account is suspended.";
+            } elseif (!empty($storedHashOrPlain) && password_verify($password, $storedHashOrPlain)) {
                 $isValid = true;
             } elseif ($storedHashOrPlain === $password) {
                 // Legacy plaintext password: migrate to hash on successful login
@@ -289,9 +292,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
                     <button id="loginBtn" class="text-green-600 hover:text-green-700 transition-colors">
                         <i class="fas fa-user mr-2"></i>Login
                     </button>
-                    <button id="signupBtn" class="text-brown-600 hover:text-brown-700 transition-colors">
-                        Sign Up
-                    </button>
                 <?php endif; ?>
             </div>
             
@@ -354,7 +354,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
                     </div>
                 </div>
                 <div class="flex-1 relative w-full h-[28rem] lg:h-[34rem]">
-                    <?php if (!empty($company_settings['hero_image']) && file_exists($company_settings['hero_image'])): ?>
+                    <?php if (!empty($company_settings['hero_image'])): ?>
                         <img src="<?php echo htmlspecialchars($company_settings['hero_image']) . '?v=' . time(); ?>" alt="<?php echo htmlspecialchars($company_settings['company_name']); ?> Hero Image" class="shadow-2xl w-full h-full object-cover">
                     <?php else: ?>
                         <!-- Fallback to existing image -->
@@ -496,41 +496,37 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
 <section id="about" class="py-20 bg-white">
     <div class="container mx-auto px-8 lg:px-32">
         <div class="text-center mb-12">
-            <h2 class="text-4xl font-extrabold text-gray-800 mb-4">About TrashSmart</h2>
+            <h2 class="text-4xl font-extrabold text-gray-800 mb-4">About <?php echo htmlspecialchars($company_settings['company_name']); ?></h2>
         </div>
         <div class="grid lg:grid-cols-2 gap-12 items-center">
             <div>
-                <p class="text-lg text-gray-600 mb-6 text-justify leading-relaxed">
-                    TrashSmart is dedicated to revolutionizing waste management for a cleaner, greener future. Our mission is to empower communities with smart solutions that make recycling and waste disposal easy, efficient, and environmentally friendly.
-                </p>
+                <p class="text-lg text-gray-700 mb-6 text-justify leading-relaxed"><?php echo nl2br(htmlspecialchars($company_settings['about_us'])); ?></p>
                 <div class="bg-green-50 border-l-4 border-green-500 p-4 mb-6">
                     <h3 class="text-lg font-semibold text-gray-800 mb-2">Our Mission</h3>
-
-                    <p class="text-gray-600 text-justify">To provide innovative waste management services that promote sustainability and community well-being.</p>
+                    <p class="text-gray-600 text-justify"><?php echo nl2br(htmlspecialchars($company_settings['mission'])); ?></p>
                 </div>
                 <div class="grid grid-cols-2 gap-6">
                     <div class="text-center">
-
-                        <div class="text-3xl font-bold text-green-600 mb-2">10K+</div>
+                        <div class="text-3xl font-bold text-green-600 mb-2"><?php echo htmlspecialchars($company_settings['stat_citizens']); ?></div>
                         <div class="text-gray-600">Happy Citizens</div>
                     </div>
                     <div class="text-center">
-                        <div class="text-3xl font-bold text-green-600 mb-2">25K+</div>
-                        <div class="text-gray-600">Pickups Completed</div>
+                        <div class="text-3xl font-bold text-green-600 mb-2"><?php echo htmlspecialchars($company_settings['stat_pickups']); ?></div>
+                        <div class="text-gray-600">Customers Served</div>
                     </div>
                     <div class="text-center">
-                        <div class="text-3xl font-bold text-green-600 mb-2">50+</div>
+                        <div class="text-3xl font-bold text-green-600 mb-2"><?php echo htmlspecialchars($company_settings['stat_partners']); ?></div>
                         <div class="text-gray-600">Partner Organizations</div>
                     </div>
                     <div class="text-center">
-                        <div class="text-3xl font-bold text-green-600 mb-2">95%</div>
+                        <div class="text-3xl font-bold text-green-600 mb-2"><?php echo htmlspecialchars($company_settings['stat_satisfaction']); ?></div>
                         <div class="text-gray-600">Satisfaction Rate</div>
-
                     </div>
                 </div>
             </div>
             <div class="text-center">
-                <img src="images/about-us.jpg" alt="About TrashSmart" class="shadow-lg w-full max-w-xl h-[24rem] object-cover mx-auto">
+                <?php $aboutImg = !empty($company_settings['about_image']) ? $company_settings['about_image'] : 'images/about-us.jpg'; ?>
+                <img src="<?php echo htmlspecialchars($aboutImg) . '?v=' . time(); ?>" alt="About <?php echo htmlspecialchars($company_settings['company_name']); ?>" class="shadow-lg w-full max-w-xl h-[24rem] object-cover mx-auto">
             </div>
         </div>
     </div>
@@ -584,37 +580,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
 
                             </div>
                         </div>
-                        <?php if ($company_settings['social_facebook'] || $company_settings['social_twitter'] || $company_settings['social_instagram'] || $company_settings['social_linkedin']): ?>
-                        <div class="border-t pt-4">
-                            <h3 class="text-base font-semibold text-gray-800 mb-2">Follow Us</h3>
-                            <div class="flex space-x-2">
-                                <?php if ($company_settings['social_facebook']): ?>
-                                <a href="<?php echo htmlspecialchars($company_settings['social_facebook']); ?>" 
-                                   class="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center text-white hover:bg-blue-700 transition-colors">
-                                    <i class="fab fa-facebook-f"></i>
-                                </a>
-                                <?php endif; ?>
-                                <?php if ($company_settings['social_twitter']): ?>
-                                <a href="<?php echo htmlspecialchars($company_settings['social_twitter']); ?>" 
-                                   class="w-8 h-8 bg-blue-400 rounded-lg flex items-center justify-center text-white hover:bg-blue-500 transition-colors">
-                                    <i class="fab fa-twitter"></i>
-                                </a>
-                                <?php endif; ?>
-                                <?php if ($company_settings['social_instagram']): ?>
-                                <a href="<?php echo htmlspecialchars($company_settings['social_instagram']); ?>" 
-                                   class="w-8 h-8 bg-pink-600 rounded-lg flex items-center justify-center text-white hover:bg-pink-700 transition-colors">
-                                    <i class="fab fa-instagram"></i>
-                                </a>
-                                <?php endif; ?>
-                                <?php if ($company_settings['social_linkedin']): ?>
-                                <a href="<?php echo htmlspecialchars($company_settings['social_linkedin']); ?>" 
-                                   class="w-8 h-8 bg-blue-800 rounded-lg flex items-center justify-center text-white hover:bg-blue-900 transition-colors">
-                                    <i class="fab fa-linkedin-in"></i>
-                                </a>
-                                <?php endif; ?>
-                            </div>
-                        </div>
-                        <?php endif; ?>
+                        
                     </div>
                 </div>
                 <div class="flex-1 bg-white rounded-xl p-8 shadow-md flex items-center justify-center">

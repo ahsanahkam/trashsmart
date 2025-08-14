@@ -407,22 +407,19 @@ foreach ($allowedExtsView as $e) {
 // Get request statistics and recent requests
 $conn = getDatabaseConnection();
 
+
 // Get counts for different statuses
 $pending_count = 0;
 $accepted_count = 0;
 $collected_count = 0;
-// Get counts for different statuses from pending_requests table only
-$pending_count = 0;
-$accepted_count = 0;
-$collected_count = 0; // Always 0 since collected records are deleted
 $rejected_count = 0;
 
+// Get counts from pending_requests
 $stats_query = "SELECT status, COUNT(*) as count FROM pending_requests WHERE user_id = ? GROUP BY status";
 $stmt = $conn->prepare($stats_query);
 $stmt->bind_param("i", $_SESSION['user_id']);
 $stmt->execute();
 $result = $stmt->get_result();
-
 while ($row = $result->fetch_assoc()) {
     switch ($row['status']) {
         case 'pending':
@@ -438,18 +435,35 @@ while ($row = $result->fetch_assoc()) {
 }
 $stmt->close();
 
-// Get recent requests (last 10)
-$recent_requests = [];
-$recent_query = "SELECT request_id, waste_type, pickup_address, preferred_pickup_date, pickup_time, status, created_at, updated_at 
-                 FROM pending_requests 
-                 WHERE user_id = ? 
-                 ORDER BY created_at DESC 
-                 LIMIT 10";
-$stmt = $conn->prepare($recent_query);
+// Get collected count from collected_requests
+$collected_count = 0;
+$stmt = $conn->prepare("SELECT COUNT(*) as count FROM collected_requests WHERE user_id = ?");
 $stmt->bind_param("i", $_SESSION['user_id']);
 $stmt->execute();
 $result = $stmt->get_result();
+if ($row = $result->fetch_assoc()) {
+    $collected_count = $row['count'];
+}
+$stmt->close();
 
+
+// Get recent requests (last 10, including collected)
+$recent_requests = [];
+$recent_query = "
+    SELECT request_id, waste_type, pickup_address, preferred_pickup_date, pickup_time, status, created_at, updated_at
+    FROM pending_requests
+    WHERE user_id = ?
+    UNION ALL
+    SELECT request_id, waste_type, pickup_address, preferred_pickup_date, pickup_time, 'collected' as status, created_at, collected_at as updated_at
+    FROM collected_requests
+    WHERE user_id = ?
+    ORDER BY updated_at DESC
+    LIMIT 10
+";
+$stmt = $conn->prepare($recent_query);
+$stmt->bind_param("ii", $_SESSION['user_id'], $_SESSION['user_id']);
+$stmt->execute();
+$result = $stmt->get_result();
 while ($row = $result->fetch_assoc()) {
     $recent_requests[] = $row;
 }

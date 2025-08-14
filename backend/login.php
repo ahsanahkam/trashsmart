@@ -29,9 +29,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $db = new Database();
             
             // Find user by email
-            $user = $db->fetch("SELECT * FROM users WHERE email = ? AND status = 'active'", [$email]);
+            $user = $db->fetch("SELECT * FROM users WHERE email = ?", [$email]);
             
-            if ($user && password_verify($password, $user['password'])) {
+            if ($user && isset($user['status']) && strtolower($user['status']) === 'suspended') {
+                $error = 'Your account is suspended.';
+            } elseif ($user && password_verify($password, $user['password']) && (!isset($user['status']) || strtolower($user['status']) === 'active')) {
                 // Login successful
                 $_SESSION['user_id'] = $user['user_id'];
                 $_SESSION['user_email'] = $user['email'];
